@@ -13,21 +13,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
 
-      - name: Install pnpm
-        run: npm install -g pnpm@10.4.1
+    - name: Install dependencies
+      run: pnpm install
+      working-directory: ./path/to/your/project # Update this to the correct path
 
-      - name: Install dependencies
-        run: pnpm install
-        working-directory: ./path/to/your/project
-
-      - name: Run build
-        run: pnpm run build
-        working-directory: ./path/to/your/project
+    - name: Run build
+      run: pnpm build
+      working-directory: ./path/to/your/project # Update this to the correct path
