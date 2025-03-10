@@ -26,8 +26,8 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-        working-directory: .././dokkai-craft/package.json
+        working-directory: dokkai-craft/package.json
 
       - name: Run build
         run: pnpm run build
-        working-directory: .././dokkai-craft/package.json
+        working-directory: dokkai-craft/package.json
