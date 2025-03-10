@@ -23,8 +23,8 @@ jobs:
 
     - name: Install dependencies
       run: pnpm install
-      working-directory: ./path/to/your/project # Update this to the correct path
+      working-directory: ./actual/path/to/your/project # ここを修正
 
     - name: Run build
       run: pnpm build
-      working-directory: ./path/to/your/project # Update this to the correct path
+      working-directory: ./actual/path/to/your/project # ここを修正
