@@ -20,12 +20,12 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: dokkai-craft  # 修正
 
       - name: Run Build
-        run: npm build
+        run: npm run build
+        working-directory: dokkai-craft  # 修正
 
       - name: Run Lint
         run: npm run lint
-
-      # - name: Run Test
-      #   run: npm run test
+        working-directory: dokkai-craft  # 修正
