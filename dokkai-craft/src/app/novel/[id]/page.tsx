@@ -243,6 +243,7 @@ export default function NovelPage({ params }: { params: { id: string } }) {
     // 実際の実装ではバックエンドにデータを送信
     toast({
       title: "コメントが投稿されました",
+      description: ""
     })
     setSentenceCommentText("")
     setSelectedSentenceIndex(null)
@@ -261,6 +262,7 @@ export default function NovelPage({ params }: { params: { id: string } }) {
     // 実際の実装ではバックエンドにデータを送信
     toast({
       title: "コメントが投稿されました",
+      description: ""
     })
     setCommentText("")
   }
