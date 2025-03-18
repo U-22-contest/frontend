@@ -11,7 +11,7 @@ const handler = NextAuth({
         email: { label: "メールアドレス", type: "email" },
         password: { label: "パスワード", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials: { email: string; password: string }) {
         // 実際の実装ではバックエンドAPIを呼び出して認証
         if (!credentials?.email || !credentials?.password) {
           return null
@@ -42,17 +42,17 @@ const handler = NextAuth({
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: any; user?: { id: string } }) {
       if (user) {
-        token.id = user.id
+        token.id = user.id;
       }
-      return token
+      return token;
     },
-    async session({  token , session }) {
+    async session({ token, session }: { token: any; session: any }) {
       if (session.user) {
-        session.user.id = token.id as string
+        session.user.id = token.id as string;
       }
-      return session
+      return session;
     },
   },
 })
