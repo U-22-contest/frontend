@@ -11,7 +11,7 @@ const handler = NextAuth({
         email: { label: "メールアドレス", type: "email" },
         password: { label: "パスワード", type: "password" },
       },
-      async authorize(credentials) {
+　　　async authorize(credentials) {
         // 実際の実装ではバックエンドAPIを呼び出して認証
         if (!credentials?.email || !credentials?.password) {
           return null
