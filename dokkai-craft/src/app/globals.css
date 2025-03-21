@@ -86,7 +86,9 @@
 }
 
 .prose p {
-  @apply my-4 leading-7;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.75;
 }
 
 /* アニメーション */
