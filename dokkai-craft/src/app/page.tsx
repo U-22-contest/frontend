@@ -1,7 +1,6 @@
+"use client"
+
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { BookOpen, Edit, TrendingUp, Bell } from "lucide-react"
 
 export default function Home() {
   // 人気の小説データ (実際の実装ではAPIから取得)
@@ -13,115 +12,413 @@ export default function Home() {
   ]
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <section className="mb-12">
-        <div className="flex flex-col items-center text-center mb-8 space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight">物語を創り、共有する場所</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
+    <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem 2rem" }}>
+      <section style={{ marginBottom: "3rem" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
+            marginBottom: "2rem",
+            gap: "1rem",
+          }}
+        >
+          <h1 style={{ marginTop: "2rem", fontSize: "2.25rem", fontWeight: "bold", letterSpacing: "-0.025em" }}>
+            物語を創り、共有する場所
+          </h1>
+          <p
+            style={{
+              fontSize: "1.25rem",
+              color: "var(--text-muted)",
+              maxWidth: "36rem",
+            }}
+          >
             AIの力で執筆をサポート。読者とのつながりを深める新しい小説プラットフォーム
           </p>
-          <div className="flex gap-4 mt-6">
-            <Button asChild size="lg">
-              <Link href="/write">
-                <Edit className="mr-2 h-4 w-4" /> 執筆を始める
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/explore">
-                <BookOpen className="mr-2 h-4 w-4" /> 作品を探す
-              </Link>
-            </Button>
+          <div style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
+            <Link
+              href="/write"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "0.75rem 1.5rem",
+                borderRadius: "0.375rem",
+                fontSize: "1rem",
+                fontWeight: 500,
+                backgroundColor: "var(--primary-color)",
+                color: "var(--primary-foreground)",
+                textDecoration: "none",
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ marginRight: "0.5rem" }}
+              >
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+              </svg>
+              執筆を始める
+            </Link>
+            <Link
+              href="/explore"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "0.75rem 1.5rem",
+                borderRadius: "0.375rem",
+                fontSize: "1rem",
+                fontWeight: 500,
+                border: "1px solid var(--border-color)",
+                backgroundColor: "transparent",
+                color: "var(--text-color)",
+                textDecoration: "none",
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ marginRight: "0.5rem" }}
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+              作品を探す
+            </Link>
           </div>
         </div>
       </section>
 
-      <section className="mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">人気の作品</h2>
-          <Button variant="ghost" asChild>
-            <Link href="/rankings">もっと見る</Link>
-          </Button>
+      <section style={{ marginBottom: "3rem" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "1.5rem",
+          }}
+        >
+          <h2 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>人気の作品</h2>
+          <Link
+            href="/rankings"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.375rem",
+              fontSize: "0.875rem",
+              fontWeight: 500,
+              backgroundColor: "transparent",
+              color: "var(--text-color)",
+              textDecoration: "none",
+            }}
+          >
+            もっと見る
+          </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "1.5rem",
+          }}
+        >
           {popularNovels.map((novel) => (
-            <Card key={novel.id} className="transition-all duration-300 hover:shadow-md">
-              <CardHeader className="pb-2">
-                <CardTitle className="line-clamp-2 text-lg">{novel.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">作者: {novel.author}</p>
-                <p className="text-sm text-muted-foreground">ジャンル: {novel.genre}</p>
-                <div className="flex items-center mt-2 text-sm">
-                  <TrendingUp className="h-4 w-4 mr-1 text-muted-foreground" />
+            <div
+              key={novel.id}
+              style={{
+                backgroundColor: "var(--bg-color)",
+                borderRadius: "0.5rem",
+                border: "1px solid var(--border-color)",
+                overflow: "hidden",
+                transition: "all 0.3s",
+                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)"
+              }}
+            >
+              <div style={{ padding: "1.25rem 1.5rem 0.5rem" }}>
+                <h3
+                  style={{
+                    fontSize: "1.125rem",
+                    fontWeight: "bold",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {novel.title}
+                </h3>
+              </div>
+              <div style={{ padding: "0 1.5rem 1.5rem" }}>
+                <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>作者: {novel.author}</p>
+                <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>ジャンル: {novel.genre}</p>
+                <div style={{ display: "flex", alignItems: "center", marginTop: "0.5rem", fontSize: "0.875rem" }}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ marginRight: "0.25rem", color: "var(--text-muted)" }}
+                  >
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                    <polyline points="17 6 23 6 23 12" />
+                  </svg>
                   <span>{novel.views.toLocaleString()} 閲覧</span>
                 </div>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" asChild className="w-full">
-                  <Link href={`/novel/${novel.id}`}>読む</Link>
-                </Button>
-              </CardFooter>
-            </Card>
+              </div>
+              <div style={{ padding: "1rem 1.5rem", borderTop: "1px solid var(--border-color)" }}>
+                <Link
+                  href={`/novel/${novel.id}`}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "0.375rem",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    textAlign: "center",
+                    border: "1px solid var(--border-color)",
+                    backgroundColor: "transparent",
+                    color: "var(--text-color)",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = "var(--bg-muted)"
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent"
+                  }}
+                >
+                  読む
+                </Link>
+              </div>
+            </div>
           ))}
         </div>
       </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        <Card>
-          <CardHeader>
-            <CardTitle>執筆者の方へ</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li className="flex items-start">
-                <div className="mr-2 mt-0.5 bg-primary/10 p-1 rounded-full">
-                  <Edit className="h-4 w-4 text-primary" />
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gap: "2rem",
+          marginBottom: "3rem",
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "var(--bg-color)",
+            borderRadius: "0.5rem",
+            border: "1px solid var(--border-color)",
+            overflow: "hidden",
+          }}
+        >
+          <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>執筆者の方へ</h3>
+          </div>
+          <div style={{ padding: "1.5rem" }}>
+            <ul style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <li style={{ display: "flex", alignItems: "flex-start" }}>
+                <div
+                  style={{
+                    marginRight: "0.5rem",
+                    marginTop: "0.125rem",
+                    backgroundColor: "rgba(var(--primary-color-rgb), 0.1)",
+                    padding: "0.25rem",
+                    borderRadius: "9999px",
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: "var(--primary-color)" }}
+                  >
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                  </svg>
                 </div>
                 <span>AIによる文章補完で執筆をスムーズに</span>
               </li>
-              <li className="flex items-start">
-                <div className="mr-2 mt-0.5 bg-primary/10 p-1 rounded-full">
-                  <Edit className="h-4 w-4 text-primary" />
+              <li style={{ display: "flex", alignItems: "flex-start" }}>
+                <div
+                  style={{
+                    marginRight: "0.5rem",
+                    marginTop: "0.125rem",
+                    backgroundColor: "rgba(var(--primary-color-rgb), 0.1)",
+                    padding: "0.25rem",
+                    borderRadius: "9999px",
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: "var(--primary-color)" }}
+                  >
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                  </svg>
                 </div>
                 <span>場面描写の提案機能で創作の幅を広げる</span>
               </li>
             </ul>
-          </CardContent>
-          <CardFooter>
-            <Button asChild>
-              <Link href="/write">執筆を始める</Link>
-            </Button>
-          </CardFooter>
-        </Card>
+          </div>
+          <div style={{ padding: "1rem 1.5rem", borderTop: "1px solid var(--border-color)" }}>
+            <Link
+              href="/write"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "0.5rem 1rem",
+                borderRadius: "0.375rem",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                backgroundColor: "var(--primary-color)",
+                color: "var(--primary-foreground)",
+                textDecoration: "none",
+              }}
+            >
+              執筆を始める
+            </Link>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>読者の方へ</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li className="flex items-start">
-                <div className="mr-2 mt-0.5 bg-primary/10 p-1 rounded-full">
-                  <BookOpen className="h-4 w-4 text-primary" />
+        <div
+          style={{
+            backgroundColor: "var(--bg-color)",
+            borderRadius: "0.5rem",
+            border: "1px solid var(--border-color)",
+            overflow: "hidden",
+          }}
+        >
+          <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>読者の方へ</h3>
+          </div>
+          <div style={{ padding: "1.5rem" }}>
+            <ul style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <li style={{ display: "flex", alignItems: "flex-start" }}>
+                <div
+                  style={{
+                    marginRight: "0.5rem",
+                    marginTop: "0.125rem",
+                    backgroundColor: "rgba(var(--primary-color-rgb), 0.1)",
+                    padding: "0.25rem",
+                    borderRadius: "9999px",
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: "var(--primary-color)" }}
+                  >
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                  </svg>
                 </div>
                 <span>本文中で質問や感想を投稿できる</span>
               </li>
-              <li className="flex items-start">
-                <div className="mr-2 mt-0.5 bg-primary/10 p-1 rounded-full">
-                  <Bell className="h-4 w-4 text-primary" />
+              <li style={{ display: "flex", alignItems: "flex-start" }}>
+                <div
+                  style={{
+                    marginRight: "0.5rem",
+                    marginTop: "0.125rem",
+                    backgroundColor: "rgba(var(--primary-color-rgb), 0.1)",
+                    padding: "0.25rem",
+                    borderRadius: "9999px",
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: "var(--primary-color)" }}
+                  >
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                  </svg>
                 </div>
                 <span>お気に入り作家の更新を通知で受け取る</span>
               </li>
             </ul>
-          </CardContent>
-          <CardFooter>
-            <Button asChild>
-              <Link href="/explore">作品を探す</Link>
-            </Button>
-          </CardFooter>
-        </Card>
+          </div>
+          <div style={{ padding: "1rem 1.5rem", borderTop: "1px solid var(--border-color)" }}>
+            <Link
+              href="/explore"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "0.5rem 1rem",
+                borderRadius: "0.375rem",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                backgroundColor: "var(--primary-color)",
+                color: "var(--primary-foreground)",
+                textDecoration: "none",
+              }}
+            >
+              作品を探す
+            </Link>
+          </div>
+        </div>
       </section>
     </main>
   )
 }
-

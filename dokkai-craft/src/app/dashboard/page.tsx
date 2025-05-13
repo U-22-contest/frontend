@@ -1,30 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts"
-import { BookOpen, Heart, MessageSquare, Users, TrendingUp, Wand2 } from "lucide-react"
 
-// モックデータ
+// モックデータ - 将来的に実際のAPIからのデータに置き換え可能
 const overviewData = {
   totalViews: 45280,
   totalLikes: 3621,
@@ -34,6 +13,7 @@ const overviewData = {
   aiUsage: 76, // AI提案の活用率（%）
 }
 
+// 閲覧数のモックデータ - 将来的に実際のAPIからのデータに置き換え可能
 const viewsData = [
   { name: "1月", views: 3200 },
   { name: "2月", views: 3800 },
@@ -49,6 +29,7 @@ const viewsData = [
   { name: "12月", views: 8500 },
 ]
 
+// エンゲージメントのモックデータ - 将来的に実際のAPIからのデータに置き換え可能
 const engagementData = [
   { name: "1月", likes: 240, comments: 80 },
   { name: "2月", likes: 280, comments: 95 },
@@ -64,13 +45,15 @@ const engagementData = [
   { name: "12月", likes: 610, comments: 210 },
 ]
 
+// AI活用状況のモックデータ - 将来的に実際のAPIからのデータに置き換え可能
 const aiUsageData = [
-  { name: "文章補完", value: 45 },
-  { name: "描写提案", value: 30 },
-  { name: "プロット提案", value: 15 },
-  { name: "キャラクター設定", value: 10 },
+  { name: "文章補完", value: 45, color: "#0088FE" },
+  { name: "描写提案", value: 30, color: "#00C49F" },
+  { name: "プロット提案", value: 15, color: "#FFBB28" },
+  { name: "キャラクター設定", value: 10, color: "#FF8042" },
 ]
 
+// 作品別パフォーマンスのモックデータ - 将来的に実際のAPIからのデータに置き換え可能
 const novelPerformanceData = [
   {
     id: 1,
@@ -114,274 +97,938 @@ const novelPerformanceData = [
   },
 ]
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"]
-
-export default function DashboardPage() {
-  const [timeRange, setTimeRange] = useState("year")
+// シンプルな折れ線グラフコンポーネント
+const SimpleLineChart = ({ data, dataKey, height = 300 }) => {
+  // データの最大値を計算
+  const maxValue = Math.max(...data.map((item) => item[dataKey])) * 1.1 // 10%余裕を持たせる
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">ダッシュボード</h1>
-          <p className="text-muted-foreground">あなたの作品のパフォーマンスを確認しましょう</p>
-        </div>
-        <div className="mt-4 md:mt-0">
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="期間を選択" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="week">過去7日間</SelectItem>
-              <SelectItem value="month">過去30日間</SelectItem>
-              <SelectItem value="year">過去12ヶ月</SelectItem>
-              <SelectItem value="all">全期間</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+    <div style={{ height: `${height}px`, position: "relative", padding: "20px 40px 20px 60px" }}>
+      {/* Y軸の目盛り */}
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          bottom: 20,
+          width: 50,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
+        {[5, 4, 3, 2, 1, 0].map((i) => (
+          <div key={i} style={{ fontSize: "10px", color: "var(--text-muted)" }}>
+            {Math.round((maxValue * i) / 5).toLocaleString()}
+          </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">総閲覧数</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <BookOpen className="h-5 w-5 text-muted-foreground mr-2" />
-              <div className="text-2xl font-bold">{overviewData.totalViews.toLocaleString()}</div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">前月比 +12.5%</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">総いいね数</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <Heart className="h-5 w-5 text-muted-foreground mr-2" />
-              <div className="text-2xl font-bold">{overviewData.totalLikes.toLocaleString()}</div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">前月比 +8.3%</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">総コメント数</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <MessageSquare className="h-5 w-5 text-muted-foreground mr-2" />
-              <div className="text-2xl font-bold">{overviewData.totalComments.toLocaleString()}</div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">前月比 +15.2%</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">フォロワー</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <Users className="h-5 w-5 text-muted-foreground mr-2" />
-              <div className="text-2xl font-bold">{overviewData.followers.toLocaleString()}</div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">前月比 +5.7%</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">エンゲージメント率</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <TrendingUp className="h-5 w-5 text-muted-foreground mr-2" />
-              <div className="text-2xl font-bold">8.9%</div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">前月比 +1.2%</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">AI提案活用率</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <Wand2 className="h-5 w-5 text-muted-foreground mr-2" />
-              <div className="text-2xl font-bold">{overviewData.aiUsage}%</div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">前月比 +4.5%</p>
-          </CardContent>
-        </Card>
+      {/* グラフ本体 */}
+      <div style={{ height: "calc(100% - 20px)", position: "relative" }}>
+        {/* 横線（グリッド） */}
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: `${i * 20}%`,
+              borderTop: "1px dashed var(--border-color)",
+              height: 1,
+            }}
+          />
+        ))}
+
+        {/* データポイント */}
+        <div style={{ position: "relative", height: "100%", display: "flex", alignItems: "flex-end" }}>
+          {data.map((item, index) => {
+            const height = (item[dataKey] / maxValue) * 100
+            return (
+              <div
+                key={index}
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  height: "100%",
+                  position: "relative",
+                }}
+              >
+                {/* データバー */}
+                <div
+                  style={{
+                    width: "8px",
+                    height: `${height}%`,
+                    backgroundColor: "var(--primary-color)",
+                    borderRadius: "4px 4px 0 0",
+                    position: "absolute",
+                    bottom: 0,
+                  }}
+                />
+
+                {/* X軸ラベル */}
+                <div style={{ position: "absolute", bottom: -20, fontSize: "10px", color: "var(--text-muted)" }}>
+                  {item.name}
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </div>
-
-      <Tabs defaultValue="views" className="mb-8">
-        <TabsList className="mb-4">
-          <TabsTrigger value="views">閲覧数</TabsTrigger>
-          <TabsTrigger value="engagement">エンゲージメント</TabsTrigger>
-          <TabsTrigger value="ai-usage">AI活用状況</TabsTrigger>
-        </TabsList>
-        <TabsContent value="views">
-          <Card>
-            <CardHeader>
-              <CardTitle>閲覧数の推移</CardTitle>
-              <CardDescription>月別の総閲覧数の推移を表示します</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={viewsData}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="views" stroke="#8884d8" activeDot={{ r: 8 }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="engagement">
-          <Card>
-            <CardHeader>
-              <CardTitle>エンゲージメントの推移</CardTitle>
-              <CardDescription>月別のいいね数とコメント数の推移を表示します</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={engagementData}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="likes" fill="#8884d8" name="いいね" />
-                    <Bar dataKey="comments" fill="#82ca9d" name="コメント" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="ai-usage">
-          <Card>
-            <CardHeader>
-              <CardTitle>AI提案の活用状況</CardTitle>
-              <CardDescription>AI機能の種類別活用状況を表示します</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col md:flex-row items-center justify-center">
-              <div className="h-[300px] w-full md:w-1/2">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={aiUsageData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-
-                      label={({ name, percent }: { name: string; percent: number }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {aiUsageData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="w-full md:w-1/2 mt-4 md:mt-0 md:ml-4">
-                <h3 className="text-lg font-medium mb-2">AI機能の活用ポイント</h3>
-                <ul className="space-y-2">
-                  <li className="flex items-start">
-                    <div className="mr-2 mt-0.5 bg-[#0088FE]/10 p-1 rounded-full">
-                      <Wand2 className="h-4 w-4 text-[#0088FE]" />
-                    </div>
-                    <span className="text-sm">文章補完は執筆の効率を45%向上させています</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="mr-2 mt-0.5 bg-[#00C49F]/10 p-1 rounded-full">
-                      <Wand2 className="h-4 w-4 text-[#00C49F]" />
-                    </div>
-                    <span className="text-sm">描写提案は読者エンゲージメントを30%向上させています</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="mr-2 mt-0.5 bg-[#FFBB28]/10 p-1 rounded-full">
-                      <Wand2 className="h-4 w-4 text-[#FFBB28]" />
-                    </div>
-                    <span className="text-sm">プロット提案は物語の展開力を15%向上させています</span>
-                  </li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>作品別パフォーマンス</CardTitle>
-          <CardDescription>各作品のパフォーマンス指標を表示します</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>タイトル</TableHead>
-                <TableHead className="text-right">閲覧数</TableHead>
-                <TableHead className="text-right">いいね</TableHead>
-                <TableHead className="text-right">コメント</TableHead>
-                <TableHead className="text-right">エンゲージメント率</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {novelPerformanceData.map((novel) => (
-                <TableRow key={novel.id}>
-                  <TableCell className="font-medium">
-                    <Link href={`/novel/${novel.id}`} className="hover:underline">
-                      {novel.title}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-right">{novel.views.toLocaleString()}</TableCell>
-                  <TableCell className="text-right">{novel.likes.toLocaleString()}</TableCell>
-                  <TableCell className="text-right">{novel.comments.toLocaleString()}</TableCell>
-                  <TableCell className="text-right">{novel.engagement}%</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-        <CardFooter>
-          <Button variant="outline" asChild className="ml-auto">
-            <Link href="/dashboard/analytics">詳細分析を見る</Link>
-          </Button>
-        </CardFooter>
-      </Card>
     </div>
   )
 }
 
+// シンプルな棒グラフコンポーネント
+const SimpleBarChart = ({ data, keys, height = 300, colors = ["var(--primary-color)", "#00C49F"] }) => {
+  // データの最大値を計算
+  let maxValue = 0
+  data.forEach((item) => {
+    keys.forEach((key) => {
+      maxValue = Math.max(maxValue, item[key])
+    })
+  })
+  maxValue = maxValue * 1.1 // 10%余裕を持たせる
+
+  return (
+    <div style={{ height: `${height}px`, position: "relative", padding: "20px 40px 20px 60px" }}>
+      {/* Y軸の目盛り */}
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          bottom: 20,
+          width: 50,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
+        {[5, 4, 3, 2, 1, 0].map((i) => (
+          <div key={i} style={{ fontSize: "10px", color: "var(--text-muted)" }}>
+            {Math.round((maxValue * i) / 5).toLocaleString()}
+          </div>
+        ))}
+      </div>
+
+      {/* グラフ本体 */}
+      <div style={{ height: "calc(100% - 20px)", position: "relative" }}>
+        {/* 横線（グリッド） */}
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: `${i * 20}%`,
+              borderTop: "1px dashed var(--border-color)",
+              height: 1,
+            }}
+          />
+        ))}
+
+        {/* データポイント */}
+        <div style={{ position: "relative", height: "100%", display: "flex", alignItems: "flex-end" }}>
+          {data.map((item, index) => (
+            <div
+              key={index}
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                height: "100%",
+                position: "relative",
+              }}
+            >
+              {/* 複数のデータバー */}
+              <div style={{ display: "flex", height: "100%", alignItems: "flex-end", gap: "4px" }}>
+                {keys.map((key, keyIndex) => {
+                  const height = (item[key] / maxValue) * 100
+                  return (
+                    <div
+                      key={keyIndex}
+                      style={{
+                        width: "8px",
+                        height: `${height}%`,
+                        backgroundColor: colors[keyIndex],
+                        borderRadius: "4px 4px 0 0",
+                      }}
+                    />
+                  )
+                })}
+              </div>
+
+              {/* X軸ラベル */}
+              <div style={{ position: "absolute", bottom: -20, fontSize: "10px", color: "var(--text-muted)" }}>
+                {item.name}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 凡例 */}
+      <div style={{ position: "absolute", top: 10, right: 10, display: "flex", flexDirection: "column", gap: "5px" }}>
+        {keys.map((key, index) => (
+          <div key={index} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            <div style={{ width: "12px", height: "12px", backgroundColor: colors[index], borderRadius: "2px" }} />
+            <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+              {key === "likes" ? "いいね" : "コメント"}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// シンプルな円グラフコンポーネント
+const SimplePieChart = ({ data, dataKey, nameKey, height = 300 }) => {
+  // 合計値を計算
+  const total = data.reduce((sum, item) => sum + item[dataKey], 0)
+
+  // 累積角度を追跡
+  let cumulativeAngle = 0
+
+  return (
+    <div
+      style={{
+        height: `${height}px`,
+        position: "relative",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      {/* 円グラフ */}
+      <div style={{ width: "200px", height: "200px", position: "relative", borderRadius: "50%", overflow: "hidden" }}>
+        {data.map((item, index) => {
+          const percentage = (item[dataKey] / total) * 100
+          const angle = (percentage / 100) * 360
+          const oldAngle = cumulativeAngle
+          cumulativeAngle += angle
+
+          return (
+            <div
+              key={index}
+              style={{
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                background: item.color,
+                clipPath: `conic-gradient(from ${oldAngle}deg, ${item.color} ${angle}deg, transparent ${angle}deg)`,
+              }}
+            />
+          )
+        })}
+      </div>
+
+      {/* 凡例 */}
+      <div
+        style={{
+          position: "absolute",
+          right: 10,
+          top: "50%",
+          transform: "translateY(-50%)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+        }}
+      >
+        {data.map((item, index) => (
+          <div key={index} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            <div style={{ width: "12px", height: "12px", backgroundColor: item.color, borderRadius: "2px" }} />
+            <span style={{ fontSize: "12px" }}>
+              {item[nameKey]} ({Math.round((item[dataKey] / total) * 100)}%)
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default function DashboardPage() {
+  const [timeRange, setTimeRange] = useState("year")
+  const [activeTab, setActiveTab] = useState("views")
+  const [isMobile, setIsMobile] = useState(false)
+
+  // 画面サイズの検出
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    // 初期チェック
+    checkIfMobile()
+
+    // リサイズイベントのリスナー
+    window.addEventListener("resize", checkIfMobile)
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile)
+    }
+  }, [])
+
+  return (
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem 1rem" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          marginBottom: "2rem",
+        }}
+      >
+        <div>
+          <h1 style={{ fontSize: "1.875rem", fontWeight: "bold" }}>ダッシュボード</h1>
+          <p style={{ color: "var(--text-muted)" }}>あなたの作品のパフォーマンスを確認しましょう</p>
+        </div>
+        <div
+          style={{
+            marginTop: "1rem",
+          }}
+        >
+          <select
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value)}
+            style={{
+              width: "180px",
+              padding: "0.5rem 2rem 0.5rem 0.75rem",
+              borderRadius: "0.375rem",
+              border: "1px solid var(--border-color)",
+              backgroundColor: "var(--bg-color)",
+              color: "var(--text-color)",
+              appearance: "none",
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "right 0.75rem center",
+              backgroundSize: "1.5em 1.5em",
+            }}
+          >
+            <option value="week">過去7日間</option>
+            <option value="month">過去30日間</option>
+            <option value="year">過去12ヶ月</option>
+            <option value="all">全期間</option>
+          </select>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(1, 1fr)",
+          gap: "1.5rem",
+          marginBottom: "2rem",
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "repeat(1, 1fr)" : "repeat(3, 1fr)",
+            gap: "1.5rem",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+              padding: "1.25rem",
+            }}
+          >
+            <div style={{ paddingBottom: "0.5rem" }}>
+              <h3 style={{ fontSize: "0.875rem", fontWeight: 500 }}>総閲覧数</h3>
+            </div>
+            <div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginRight: "0.5rem", color: "var(--text-muted)" }}
+                >
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+                <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{overviewData.totalViews.toLocaleString()}</div>
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>前月比 +12.5%</p>
+            </div>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+              padding: "1.25rem",
+            }}
+          >
+            <div style={{ paddingBottom: "0.5rem" }}>
+              <h3 style={{ fontSize: "0.875rem", fontWeight: 500 }}>総いいね数</h3>
+            </div>
+            <div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginRight: "0.5rem", color: "var(--text-muted)" }}
+                >
+                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                </svg>
+                <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{overviewData.totalLikes.toLocaleString()}</div>
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>前月比 +8.3%</p>
+            </div>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+              padding: "1.25rem",
+            }}
+          >
+            <div style={{ paddingBottom: "0.5rem" }}>
+              <h3 style={{ fontSize: "0.875rem", fontWeight: 500 }}>総コメント数</h3>
+            </div>
+            <div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginRight: "0.5rem", color: "var(--text-muted)" }}
+                >
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+                  {overviewData.totalComments.toLocaleString()}
+                </div>
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>前月比 +15.2%</p>
+            </div>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+              padding: "1.25rem",
+            }}
+          >
+            <div style={{ paddingBottom: "0.5rem" }}>
+              <h3 style={{ fontSize: "0.875rem", fontWeight: 500 }}>フォロワー</h3>
+            </div>
+            <div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginRight: "0.5rem", color: "var(--text-muted)" }}
+                >
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{overviewData.followers.toLocaleString()}</div>
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>前月比 +5.7%</p>
+            </div>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+              padding: "1.25rem",
+            }}
+          >
+            <div style={{ paddingBottom: "0.5rem" }}>
+              <h3 style={{ fontSize: "0.875rem", fontWeight: 500 }}>エンゲージメント率</h3>
+            </div>
+            <div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginRight: "0.5rem", color: "var(--text-muted)" }}
+                >
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                  <polyline points="17 6 23 6 23 12" />
+                </svg>
+                <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>8.9%</div>
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>前月比 +1.2%</p>
+            </div>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+              padding: "1.25rem",
+            }}
+          >
+            <div style={{ paddingBottom: "0.5rem" }}>
+              <h3 style={{ fontSize: "0.875rem", fontWeight: 500 }}>AI提案活用率</h3>
+            </div>
+            <div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginRight: "0.5rem", color: "var(--text-muted)" }}
+                >
+                  <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+                  <path d="M9 18h6" />
+                  <path d="M10 22h4" />
+                </svg>
+                <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{overviewData.aiUsage}%</div>
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>前月比 +4.5%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: "2rem" }}>
+        <div
+          style={{
+            display: "flex",
+            borderBottom: "1px solid var(--border-color)",
+            marginBottom: "1rem",
+          }}
+        >
+          <button
+            onClick={() => setActiveTab("views")}
+            style={{
+              padding: "0.5rem 1rem",
+              fontWeight: 500,
+              borderBottom: activeTab === "views" ? "2px solid var(--primary-color)" : "2px solid transparent",
+              color: activeTab === "views" ? "var(--primary-color)" : "inherit",
+              cursor: "pointer",
+              background: "none",
+              border: "none",
+              outline: "none",
+            }}
+          >
+            閲覧数
+          </button>
+          <button
+            onClick={() => setActiveTab("engagement")}
+            style={{
+              padding: "0.5rem 1rem",
+              fontWeight: 500,
+              borderBottom: activeTab === "engagement" ? "2px solid var(--primary-color)" : "2px solid transparent",
+              color: activeTab === "engagement" ? "var(--primary-color)" : "inherit",
+              cursor: "pointer",
+              background: "none",
+              border: "none",
+              outline: "none",
+            }}
+          >
+            エンゲージメント
+          </button>
+          <button
+            onClick={() => setActiveTab("ai-usage")}
+            style={{
+              padding: "0.5rem 1rem",
+              fontWeight: 500,
+              borderBottom: activeTab === "ai-usage" ? "2px solid var(--primary-color)" : "2px solid transparent",
+              color: activeTab === "ai-usage" ? "var(--primary-color)" : "inherit",
+              cursor: "pointer",
+              background: "none",
+              border: "none",
+              outline: "none",
+            }}
+          >
+            AI活用状況
+          </button>
+        </div>
+
+        {activeTab === "views" && (
+          <div
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+              overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>閲覧数の推移</h2>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>月別の総閲覧数の推移を表示します</p>
+            </div>
+            <div style={{ padding: "1.5rem" }}>
+              <SimpleLineChart data={viewsData} dataKey="views" height={300} />
+            </div>
+          </div>
+        )}
+
+        {activeTab === "engagement" && (
+          <div
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+              overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>エンゲージメントの推移</h2>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>
+                月別のいいね数とコメント数の推移を表示します
+              </p>
+            </div>
+            <div style={{ padding: "1.5rem" }}>
+              <SimpleBarChart
+                data={engagementData}
+                keys={["likes", "comments"]}
+                colors={["var(--primary-color)", "#00C49F"]}
+                height={300}
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === "ai-usage" && (
+          <div
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+              overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>AI提案の活用状況</h2>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>AI機能の種類別活用状況を表示します</p>
+            </div>
+            <div style={{ padding: "1.5rem" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <SimplePieChart data={aiUsageData} dataKey="value" nameKey="name" height={300} />
+
+                <div style={{ width: "100%", marginTop: "1rem" }}>
+                  <h3 style={{ fontSize: "1.125rem", fontWeight: 500, marginBottom: "0.5rem" }}>
+                    AI機能の活用ポイント
+                  </h3>
+                  <ul style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    <li style={{ display: "flex", alignItems: "flex-start" }}>
+                      <div
+                        style={{
+                          marginRight: "0.5rem",
+                          marginTop: "0.125rem",
+                          backgroundColor: "rgba(0, 136, 254, 0.1)",
+                          padding: "0.25rem",
+                          borderRadius: "9999px",
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#0088FE"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+                          <path d="M9 18h6" />
+                          <path d="M10 22h4" />
+                        </svg>
+                      </div>
+                      <span style={{ fontSize: "0.875rem" }}>文章補完は執筆の効率を45%向上させています</span>
+                    </li>
+                    <li style={{ display: "flex", alignItems: "flex-start" }}>
+                      <div
+                        style={{
+                          marginRight: "0.5rem",
+                          marginTop: "0.125rem",
+                          backgroundColor: "rgba(0, 196, 159, 0.1)",
+                          padding: "0.25rem",
+                          borderRadius: "9999px",
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#00C49F"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+                          <path d="M9 18h6" />
+                          <path d="M10 22h4" />
+                        </svg>
+                      </div>
+                      <span style={{ fontSize: "0.875rem" }}>描写提案は読者エンゲージメントを30%向上させています</span>
+                    </li>
+                    <li style={{ display: "flex", alignItems: "flex-start" }}>
+                      <div
+                        style={{
+                          marginRight: "0.5rem",
+                          marginTop: "0.125rem",
+                          backgroundColor: "rgba(255, 187, 40, 0.1)",
+                          padding: "0.25rem",
+                          borderRadius: "9999px",
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#FFBB28"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+                          <path d="M9 18h6" />
+                          <path d="M10 22h4" />
+                        </svg>
+                      </div>
+                      <span style={{ fontSize: "0.875rem" }}>プロット提案は物語の展開力を15%向上させています</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div
+        style={{
+          backgroundColor: "var(--bg-color)",
+          borderRadius: "0.5rem",
+          border: "1px solid var(--border-color)",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+          <h2 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>作品別パフォーマンス</h2>
+          <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>各作品のパフォーマンス指標を表示します</p>
+        </div>
+        <div style={{ padding: "1.5rem" }}>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontWeight: 500, fontSize: "0.875rem" }}>
+                    タイトル
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "right",
+                      padding: "0.75rem 1rem",
+                      fontWeight: 500,
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    閲覧数
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "right",
+                      padding: "0.75rem 1rem",
+                      fontWeight: 500,
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    いいね
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "right",
+                      padding: "0.75rem 1rem",
+                      fontWeight: 500,
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    コメント
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "right",
+                      padding: "0.75rem 1rem",
+                      fontWeight: 500,
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    エンゲージメント率
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {novelPerformanceData.map((novel) => (
+                  <tr
+                    key={novel.id}
+                    style={{
+                      borderBottom: "1px solid var(--border-color)",
+                    }}
+                  >
+                    <td
+                      style={{
+                        padding: "0.75rem 1rem",
+                        fontWeight: 500,
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      <Link
+                        href={`/novel/${novel.id}`}
+                        style={{
+                          color: "var(--text-color)",
+                          textDecoration: "none",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.textDecoration = "underline"
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.textDecoration = "none"
+                        }}
+                      >
+                        {novel.title}
+                      </Link>
+                    </td>
+                    <td
+                      style={{
+                        textAlign: "right",
+                        padding: "0.75rem 1rem",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      {novel.views.toLocaleString()}
+                    </td>
+                    <td
+                      style={{
+                        textAlign: "right",
+                        padding: "0.75rem 1rem",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      {novel.likes.toLocaleString()}
+                    </td>
+                    <td
+                      style={{
+                        textAlign: "right",
+                        padding: "0.75rem 1rem",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      {novel.comments.toLocaleString()}
+                    </td>
+                    <td
+                      style={{
+                        textAlign: "right",
+                        padding: "0.75rem 1rem",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      {novel.engagement}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div
+          style={{
+            padding: "1rem 1.5rem",
+            borderTop: "1px solid var(--border-color)",
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          <Link
+            href="/dashboard/analytics"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.375rem",
+              fontSize: "0.875rem",
+              fontWeight: 500,
+              border: "1px solid var(--border-color)",
+              backgroundColor: "transparent",
+              color: "var(--text-color)",
+              textDecoration: "none",
+            }}
+          >
+            詳細分析を見る
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}

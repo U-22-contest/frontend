@@ -5,15 +5,9 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -31,11 +25,7 @@ export default function RegisterPage() {
     e.preventDefault()
 
     if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "パスワードが一致しません",
-        description: "確認用パスワードが一致していることを確認してください",
-        variant: "destructive",
-      })
+      alert("パスワードが一致しません: 確認用パスワードが一致していることを確認してください")
       return
     }
 
@@ -45,46 +35,86 @@ export default function RegisterPage() {
       // 実際の実装ではバックエンドAPIを呼び出して登録処理
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      toast({
-        title: "登録が完了しました",
-        description: "ログインしてサービスをご利用ください",
-      })
-
+      alert("登録が完了しました: ログインしてサービスをご利用ください")
       router.push("/login")
     } catch (error) {
-      toast({
-        title: "エラーが発生しました",
-        description: "後でもう一度お試しください",
-        variant: "destructive",
-      })
+      alert("エラーが発生しました: 後でもう一度お試しください")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="container flex h-screen items-center justify-center">
-      <Card className="mx-auto max-w-sm">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">アカウント登録</CardTitle>
-          <CardDescription>新しいアカウントを作成して始めましょう</CardDescription>
-        </CardHeader>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0 1rem",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "var(--bg-color)",
+          borderRadius: "0.5rem",
+          border: "1px solid var(--border-color)",
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+          width: "100%",
+          maxWidth: "24rem",
+          margin: "0 auto",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+          <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>アカウント登録</h1>
+          <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>新しいアカウントを作成して始めましょう</p>
+        </div>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">ユーザー名</Label>
-              <Input
+          <div style={{ padding: "1.5rem" }}>
+            <div style={{ marginBottom: "1rem" }}>
+              <label
+                htmlFor="name"
+                style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  marginBottom: "0.5rem",
+                }}
+              >
+                ユーザー名
+              </label>
+              <input
                 id="name"
                 name="name"
                 placeholder="ユーザー名"
                 required
                 value={formData.name}
                 onChange={handleChange}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem 0.75rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                  fontSize: "0.875rem",
+                }}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">メールアドレス</Label>
-              <Input
+            <div style={{ marginBottom: "1rem" }}>
+              <label
+                htmlFor="email"
+                style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  marginBottom: "0.5rem",
+                }}
+              >
+                メールアドレス
+              </label>
+              <input
                 id="email"
                 name="email"
                 type="email"
@@ -92,45 +122,120 @@ export default function RegisterPage() {
                 required
                 value={formData.email}
                 onChange={handleChange}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem 0.75rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                  fontSize: "0.875rem",
+                }}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">パスワード</Label>
-              <Input
+            <div style={{ marginBottom: "1rem" }}>
+              <label
+                htmlFor="password"
+                style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  marginBottom: "0.5rem",
+                }}
+              >
+                パスワード
+              </label>
+              <input
                 id="password"
                 name="password"
                 type="password"
                 required
                 value={formData.password}
                 onChange={handleChange}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem 0.75rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                  fontSize: "0.875rem",
+                }}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">パスワード（確認）</Label>
-              <Input
+            <div style={{ marginBottom: "1.5rem" }}>
+              <label
+                htmlFor="confirmPassword"
+                style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  marginBottom: "0.5rem",
+                }}
+              >
+                パスワード（確認）
+              </label>
+              <input
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem 0.75rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                  fontSize: "0.875rem",
+                }}
               />
             </div>
-            <Button className="w-full" type="submit" disabled={isLoading}>
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                padding: "0.5rem 1rem",
+                borderRadius: "0.375rem",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                backgroundColor: "var(--primary-color)",
+                color: "var(--primary-foreground)",
+                border: "none",
+                cursor: isLoading ? "not-allowed" : "pointer",
+                opacity: isLoading ? 0.5 : 1,
+              }}
+            >
               {isLoading ? "登録中..." : "登録する"}
-            </Button>
-          </CardContent>
+            </button>
+          </div>
         </form>
-        <CardFooter className="flex flex-col items-center">
-          <p className="text-sm text-muted-foreground">
+        <div
+          style={{
+            padding: "1rem 1.5rem",
+            borderTop: "1px solid var(--border-color)",
+            textAlign: "center",
+          }}
+        >
+          <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>
             すでにアカウントをお持ちですか？{" "}
-            <Link href="/login" className="text-primary underline-offset-4 hover:underline">
+            <Link
+              href="/login"
+              style={{
+                color: "var(--primary-color)",
+                textDecoration: "none",
+              }}
+            >
               ログイン
             </Link>
           </p>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
-
