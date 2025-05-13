@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { ThemeSwitcher } from "./theme-switcher"
+import Image from "next/image"
 
 // 仮のユーザー認証状態
 const isAuthenticated = true
@@ -451,10 +452,12 @@ export default function Navbar() {
                       justifyContent: "center",
                     }}
                   >
-                    <img
+                    <Image
                       src="/placeholder.svg?height=32&width=32"
-                      alt="ユーザー"
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      alt="ユーザーアイコン"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
                     />
                     <span
                       style={{

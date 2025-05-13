@@ -28,7 +28,7 @@ export default function LoginPage() {
       } else {
         alert("ログインに失敗しました: メールアドレスまたはパスワードが正しくありません")
       }
-    } catch (error) {
+    } catch {
       alert("エラーが発生しました: 後でもう一度お試しください")
     } finally {
       setIsLoading(false)
@@ -42,7 +42,7 @@ export default function LoginPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       alert("Googleでのログインは実装中です")
       setIsLoading(false)
-    } catch (error) {
+    } catch {
       alert("エラーが発生しました: 後でもう一度お試しください")
       setIsLoading(false)
     }

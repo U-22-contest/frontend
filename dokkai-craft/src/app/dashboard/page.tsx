@@ -14,24 +14,19 @@ const overviewData = {
 }
 
 // データ型の定義
-type BaseChartDataItem = {
+type ViewsDataItem = {
   name: string
-}
-
-type ChartDataItem = BaseChartDataItem & {
-  [key: string]: string | number // nameプロパティと他のプロパティを許容
-}
-
-type ViewsDataItem = BaseChartDataItem & {
   views: number
 }
 
-type EngagementDataItem = BaseChartDataItem & {
+type EngagementDataItem = {
+  name: string
   likes: number
   comments: number
 }
 
-type AiUsageDataItem = BaseChartDataItem & {
+type AiUsageDataItem = {
+  name: string
   value: number
   color: string
 }
@@ -122,7 +117,6 @@ const novelPerformanceData = [
 
 type SimpleLineChartProps = {
   data: ViewsDataItem[] // より具体的な型を使用
-  dataKey: "views" // リテラル型で制限
   height?: number
 }
 
@@ -135,13 +129,12 @@ type SimpleBarChartProps = {
 
 type SimplePieChartProps = {
   data: AiUsageDataItem[]
-  dataKey: "value" // リテラル型で制限
   nameKey: "name" // リテラル型で制限
   height?: number
 }
 
 // シンプルな折れ線グラフコンポーネント
-const SimpleLineChart = ({ data, dataKey, height = 300 }: SimpleLineChartProps) => {
+const SimpleLineChart = ({ data, height = 300 }: SimpleLineChartProps) => {
   // データの最大値を計算
   const maxValue = Math.max(...data.map((item) => item.views)) * 1.1 // 10%余裕を持たせる
 
@@ -332,7 +325,7 @@ const SimpleBarChart = ({ data, keys, height = 300, colors = ["var(--primary-col
 }
 
 // シンプルな円グラフコンポーネント
-const SimplePieChart = ({ data, dataKey, nameKey, height = 300 }: SimplePieChartProps) => {
+const SimplePieChart = ({ data, nameKey, height = 300 }: SimplePieChartProps) => {
   // 合計値を計算
   const total = data.reduce((sum, item) => sum + item.value, 0)
 
@@ -757,7 +750,7 @@ export default function DashboardPage() {
               <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>月別の総閲覧数の推移を表示します</p>
             </div>
             <div style={{ padding: "1.5rem" }}>
-              <SimpleLineChart data={viewsData} dataKey="views" height={300} />
+              <SimpleLineChart data={viewsData} height={300} />
             </div>
           </div>
         )}
@@ -810,7 +803,7 @@ export default function DashboardPage() {
                   justifyContent: "center",
                 }}
               >
-                <SimplePieChart data={aiUsageData} dataKey="value" nameKey="name" height={300} />
+                <SimplePieChart data={aiUsageData} nameKey="name" height={300} />
 
                 <div style={{ width: "100%", marginTop: "1rem" }}>
                   <h3 style={{ fontSize: "1.125rem", fontWeight: 500, marginBottom: "0.5rem" }}>

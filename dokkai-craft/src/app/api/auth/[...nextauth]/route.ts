@@ -1,7 +1,8 @@
-import NextAuth, { DefaultSession, NextAuthOptions } from "next-auth"
+import NextAuth from "next-auth"
+import type { DefaultSession, NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
-import { JWT } from "next-auth/jwt"
+import type { JWT } from "next-auth/jwt"
 
 // セッションの型を拡張
 declare module "next-auth" {
@@ -56,13 +57,13 @@ const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user: any }) {
+    async jwt({ token, user }: { token: JWT; user?: { id: string } }) {
       if (user) {
         token.id = user.id
       }
       return token
     },
-    async session({ token, session }: { token: JWT; session: any }) {
+    async session({ token, session }: { token: JWT; session: import("next-auth").Session }) {
       if (session.user) {
         session.user.id = token.id as string
       }

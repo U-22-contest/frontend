@@ -38,7 +38,7 @@ export default function WritePage() {
       ]
 
       setAiSuggestions(mockSuggestions)
-    } catch (error) {
+    } catch {
       alert("エラーが発生しました: AIサービスに接続できませんでした。後でもう一度お試しください。")
     } finally {
       setIsGenerating(false)
@@ -66,7 +66,7 @@ export default function WritePage() {
       ]
 
       setAiSuggestions(mockSuggestions)
-    } catch (error) {
+    } catch {
       alert("エラーが発生しました: AIサービスに接続できませんでした。後でもう一度お試しください。")
     } finally {
       setIsGenerating(false)

@@ -1,29 +1,6 @@
 import Link from "next/link"
 import styles from "./footer.module.css"
 
-// メディアクエリ用のスタイル
-const mediaStyles = {
-  "@media (min-width: 768px)": {
-    container: {
-      flexDirection: "row",
-    },
-    logoContainer: {
-      alignItems: "flex-start",
-      gap: "0.5rem",
-    },
-    copyright: {
-      textAlign: "left",
-    },
-    navContainer: {
-      flexDirection: "row",
-      gap: "1.5rem",
-    },
-    nav: {
-      gap: "1.5rem",
-    },
-  },
-}
-
 export default function Footer() {
   return (
     <footer className={styles.footer}>
