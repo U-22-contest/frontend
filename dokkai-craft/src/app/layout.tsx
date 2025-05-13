@@ -19,16 +19,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={inter.className} style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <div className="flex-grow">{children}</div>
-            <Footer />
-          </div>
+          <Navbar />
+          <div style={{ flexGrow: 1 }}>{children}</div>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
   )
 }
-

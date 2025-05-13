@@ -1,22 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Wand2, Save, BookOpen, HelpCircle, Sparkles } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
 
 export default function WritePage() {
-  const { toast } = useToast()
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
   const [selectedText, setSelectedText] = useState("")
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
+  const [genre, setGenre] = useState("fantasy")
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false)
 
   // テキストエリアでのテキスト選択を処理
   const handleTextSelect = () => {
@@ -37,19 +30,15 @@ export default function WritePage() {
 
       const mockSuggestions = [
         content +
-          "彼は窓の外を見つめ、遠くに広がる山々の稜線を眺めた。雲が低く垂れ込め、雨の匂いが空気中に漂っていた。",
+        "彼は窓の外を見つめ、遠くに広がる山々の稜線を眺めた。雲が低く垂れ込め、雨の匂いが空気中に漂っていた。",
         content +
-          "彼女は深呼吸をして、目の前の課題に集中した。これまでの努力が実を結ぶ瞬間が近づいていることを感じていた。",
+        "彼女は深呼吸をして、目の前の課題に集中した。これまでの努力が実を結ぶ瞬間が近づいていることを感じていた。",
         content + "街の喧騒が遠のき、静寂が訪れた。時折聞こえる風の音だけが、この場所が現実であることを思い出させた。",
       ]
 
       setAiSuggestions(mockSuggestions)
     } catch (error) {
-      toast({
-        title: "エラーが発生しました",
-        description: "AIサービスに接続できませんでした。後でもう一度お試しください。",
-        variant: "destructive",
-      })
+      alert("エラーが発生しました: AIサービスに接続できませんでした。後でもう一度お試しください。")
     } finally {
       setIsGenerating(false)
     }
@@ -58,10 +47,7 @@ export default function WritePage() {
   // 描写の提案を取得
   const getDescriptionSuggestions = async () => {
     if (!selectedText) {
-      toast({
-        title: "テキストが選択されていません",
-        description: "描写の提案を受けるには、テキストを選択してください。",
-      })
+      alert("テキストが選択されていません: 描写の提案を受けるには、テキストを選択してください。")
       return
     }
 
@@ -80,11 +66,7 @@ export default function WritePage() {
 
       setAiSuggestions(mockSuggestions)
     } catch (error) {
-      toast({
-        title: "エラーが発生しました",
-        description: "AIサービスに接続できませんでした。後でもう一度お試しください。",
-        variant: "destructive",
-      })
+      alert("エラーが発生しました: AIサービスに接続できませんでした。後でもう一度お試しください。")
     } finally {
       setIsGenerating(false)
     }
@@ -105,131 +87,402 @@ export default function WritePage() {
   // 作品を保存
   const saveNovel = () => {
     if (!title) {
-      toast({
-        title: "タイトルが入力されていません",
-        description: "作品を保存するには、タイトルを入力してください。",
-      })
+      alert("タイトルが入力されていません: 作品を保存するには、タイトルを入力してください。")
       return
     }
 
     // 実際の実装ではバックエンドにデータを送信
-    toast({
-      title: "作品が保存されました",
-      description: "下書きとして保存しました。",
-    })
+    alert("作品が保存されました: 下書きとして保存しました。")
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex-1">
-          <div className="mb-6">
-            <Input
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem 1rem" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "1.5rem",
+          "@media (min-width: 1024px)": {
+            flexDirection: "row",
+          },
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          <div style={{ marginBottom: "1.5rem" }}>
+            <input
+              type="text"
               placeholder="タイトルを入力"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="text-xl font-bold"
+              style={{
+                width: "100%",
+                padding: "0.75rem",
+                fontSize: "1.25rem",
+                fontWeight: "bold",
+                borderRadius: "0.375rem",
+                border: "1px solid var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
             />
           </div>
 
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Select defaultValue="fantasy">
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="ジャンルを選択" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fantasy">ファンタジー</SelectItem>
-                  <SelectItem value="sf">SF</SelectItem>
-                  <SelectItem value="romance">恋愛</SelectItem>
-                  <SelectItem value="mystery">ミステリー</SelectItem>
-                  <SelectItem value="daily">日常</SelectItem>
-                </SelectContent>
-              </Select>
+          <div
+            style={{
+              marginBottom: "1rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <div style={{ position: "relative" }}>
+                <select
+                  value={genre}
+                  onChange={(e) => setGenre(e.target.value)}
+                  style={{
+                    width: "180px",
+                    padding: "0.5rem 2rem 0.5rem 0.75rem",
+                    borderRadius: "0.375rem",
+                    border: "1px solid var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                    appearance: "none",
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  <option value="fantasy">ファンタジー</option>
+                  <option value="sf">SF</option>
+                  <option value="romance">恋愛</option>
+                  <option value="mystery">ミステリー</option>
+                  <option value="daily">日常</option>
+                </select>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    position: "absolute",
+                    right: "0.75rem",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    pointerEvents: "none",
+                  }}
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </div>
 
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <HelpCircle className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
+              <div style={{ position: "relative" }}>
+                <button
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "2rem",
+                    height: "2rem",
+                    borderRadius: "0.375rem",
+                    border: "1px solid var(--border-color)",
+                    backgroundColor: "transparent",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={() => setIsTooltipVisible(true)}
+                  onMouseLeave={() => setIsTooltipVisible(false)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                    <path d="M12 17h.01" />
+                  </svg>
+                </button>
+                {isTooltipVisible && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      marginTop: "0.5rem",
+                      padding: "0.5rem",
+                      backgroundColor: "var(--bg-color)",
+                      border: "1px solid var(--border-color)",
+                      borderRadius: "0.375rem",
+                      boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                      zIndex: 10,
+                      width: "200px",
+                      textAlign: "center",
+                      fontSize: "0.875rem",
+                    }}
+                  >
                     <p>ジャンルを選択すると、AIがそのジャンルに適した提案をします</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={saveNovel}>
-                <Save className="mr-2 h-4 w-4" />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <button
+                onClick={saveNovel}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "0.375rem",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "transparent",
+                  color: "var(--text-color)",
+                  cursor: "pointer",
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginRight: "0.5rem" }}
+                >
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
                 保存
-              </Button>
-              <Button variant="outline">
-                <BookOpen className="mr-2 h-4 w-4" />
+              </button>
+              <button
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "0.375rem",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "transparent",
+                  color: "var(--text-color)",
+                  cursor: "pointer",
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginRight: "0.5rem" }}
+                >
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
                 プレビュー
-              </Button>
+              </button>
             </div>
           </div>
 
-          <Textarea
+          <textarea
             placeholder="ここに物語を書き始めましょう..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onMouseUp={handleTextSelect}
-            className="min-h-[60vh] text-base leading-relaxed resize-none"
+            style={{
+              width: "100%",
+              minHeight: "60vh",
+              padding: "1rem",
+              fontSize: "1rem",
+              lineHeight: 1.5,
+              resize: "none",
+              borderRadius: "0.375rem",
+              border: "1px solid var(--border-color)",
+              backgroundColor: "var(--bg-color)",
+              color: "var(--text-color)",
+            }}
           />
 
-          <div className="mt-4 flex justify-between">
-            <Button onClick={handleAIComplete} disabled={isGenerating || !content} className="gap-2">
-              <Wand2 className="h-4 w-4" />
+          <div
+            style={{
+              marginTop: "1rem",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <button
+              onClick={handleAIComplete}
+              disabled={isGenerating || !content}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.5rem 1rem",
+                borderRadius: "0.375rem",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                backgroundColor: "var(--primary-color)",
+                color: "var(--primary-foreground)",
+                border: "none",
+                cursor: isGenerating || !content ? "not-allowed" : "pointer",
+                opacity: isGenerating || !content ? 0.5 : 1,
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+                <path d="M9 18h6" />
+                <path d="M10 22h4" />
+              </svg>
               AIで続きを書く
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={getDescriptionSuggestions}
               disabled={isGenerating || !selectedText}
-              variant="outline"
-              className="gap-2"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.5rem 1rem",
+                borderRadius: "0.375rem",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                border: "1px solid var(--border-color)",
+                backgroundColor: "transparent",
+                color: "var(--text-color)",
+                cursor: isGenerating || !selectedText ? "not-allowed" : "pointer",
+                opacity: isGenerating || !selectedText ? 0.5 : 1,
+              }}
             >
-              <Sparkles className="h-4 w-4" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                <path d="M5 3v4" />
+                <path d="M19 17v4" />
+                <path d="M3 5h4" />
+                <path d="M17 19h4" />
+              </svg>
               選択部分の描写を改善
-            </Button>
+            </button>
           </div>
         </div>
 
         {aiSuggestions.length > 0 && (
-          <div className="lg:w-1/3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">AIの提案</CardTitle>
-                <CardDescription>
+          <div
+            style={{
+              width: "100%",
+              "@media (min-width: 1024px)": {
+                width: "33.333333%",
+              },
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: "var(--bg-color)",
+                borderRadius: "0.5rem",
+                border: "1px solid var(--border-color)",
+                overflow: "hidden",
+              }}
+            >
+              <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>AIの提案</h2>
+                <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>
                   {selectedText ? "選択したテキストの描写の改善案です" : "物語の続きの提案です"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+                </p>
+              </div>
+              <div style={{ padding: "1.5rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                   {aiSuggestions.map((suggestion, index) => (
                     <div
                       key={index}
-                      className="p-3 border rounded-md hover:bg-accent transition-colors cursor-pointer"
+                      style={{
+                        padding: "0.75rem",
+                        border: "1px solid var(--border-color)",
+                        borderRadius: "0.5rem",
+                        cursor: "pointer",
+                        transition: "background-color 0.2s",
+                      }}
                       onClick={() => applySuggestion(suggestion)}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = "var(--bg-muted)"
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent"
+                      }}
                     >
-                      <p className="text-sm">{suggestion}</p>
+                      <p style={{ fontSize: "0.875rem" }}>{suggestion}</p>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-end">
-                <Button variant="ghost" size="sm" onClick={() => setAiSuggestions([])}>
+              </div>
+              <div
+                style={{
+                  padding: "1rem 1.5rem",
+                  borderTop: "1px solid var(--border-color)",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <button
+                  onClick={() => setAiSuggestions([])}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "0.375rem",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    backgroundColor: "transparent",
+                    color: "var(--text-color)",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
                   閉じる
-                </Button>
-              </CardFooter>
-            </Card>
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
     </div>
   )
 }
-

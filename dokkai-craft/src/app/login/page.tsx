@@ -5,16 +5,9 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { signIn } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -24,32 +17,19 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      })
+      // 実際の実装ではNextAuthを使用して認証
+      await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      if (result?.error) {
-        toast({
-          title: "ログインに失敗しました",
-          description: "メールアドレスまたはパスワードが正しくありません",
-          variant: "destructive",
-        })
-      } else {
-        toast({
-          title: "ログインしました",
-          description: "ようこそ戻ってきました！",
-        })
+      // モックユーザーの検証（実際の実装では削除）
+      if (email === "user@example.com" && password === "password") {
+        alert("ログインしました: ようこそ戻ってきました！")
         router.push("/")
         router.refresh()
+      } else {
+        alert("ログインに失敗しました: メールアドレスまたはパスワードが正しくありません")
       }
     } catch (error) {
-      toast({
-        title: "エラーが発生しました",
-        description: "後でもう一度お試しください",
-        variant: "destructive",
-      })
+      alert("エラーが発生しました: 後でもう一度お試しください")
     } finally {
       setIsLoading(false)
     }
@@ -58,82 +38,217 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
     try {
-      await signIn("google", { callbackUrl: "/" })
+      // 実際の実装ではNextAuthを使用してGoogle認証
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      alert("Googleでのログインは実装中です")
+      setIsLoading(false)
     } catch (error) {
-      toast({
-        title: "エラーが発生しました",
-        description: "後でもう一度お試しください",
-        variant: "destructive",
-      })
+      alert("エラーが発生しました: 後でもう一度お試しください")
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="container flex h-screen items-center justify-center">
-      <Card className="mx-auto max-w-sm">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">ログイン</CardTitle>
-          <CardDescription>アカウントにログインして続行してください</CardDescription>
-        </CardHeader>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0 1rem",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "var(--bg-color)",
+          borderRadius: "0.5rem",
+          border: "1px solid var(--border-color)",
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+          width: "100%",
+          maxWidth: "24rem",
+          margin: "0 auto",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+          <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>ログイン</h1>
+          <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>アカウントにログインして続行してください</p>
+        </div>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">メールアドレス</Label>
-              <Input
+          <div style={{ padding: "1.5rem" }}>
+            <div style={{ marginBottom: "1rem" }}>
+              <label
+                htmlFor="email"
+                style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  marginBottom: "0.5rem",
+                }}
+              >
+                メールアドレス
+              </label>
+              <input
                 id="email"
                 type="email"
                 placeholder="example@example.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem 0.75rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                  fontSize: "0.875rem",
+                }}
               />
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">パスワード</Label>
-                <Link href="/forgot-password" className="text-sm text-primary underline-offset-4 hover:underline">
+            <div style={{ marginBottom: "1rem" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                <label
+                  htmlFor="password"
+                  style={{
+                    display: "block",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                  }}
+                >
+                  パスワード
+                </label>
+                <Link
+                  href="/forgot-password"
+                  style={{
+                    fontSize: "0.875rem",
+                    color: "var(--primary-color)",
+                    textDecoration: "none",
+                  }}
+                >
                   パスワードをお忘れですか？
                 </Link>
               </div>
-              <Input
+              <input
                 id="password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem 0.75rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                  fontSize: "0.875rem",
+                }}
               />
             </div>
-            <Button className="w-full" type="submit" disabled={isLoading}>
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                padding: "0.5rem 1rem",
+                borderRadius: "0.375rem",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                backgroundColor: "var(--primary-color)",
+                color: "var(--primary-foreground)",
+                border: "none",
+                cursor: isLoading ? "not-allowed" : "pointer",
+                opacity: isLoading ? 0.5 : 1,
+                marginBottom: "1rem",
+              }}
+            >
               {isLoading ? "ログイン中..." : "ログイン"}
-            </Button>
-            <div className="relative flex items-center justify-center">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+            </button>
+            <div
+              style={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: "1rem",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <span style={{ width: "100%", height: "1px", backgroundColor: "var(--border-color)" }} />
               </div>
-              <span className="relative bg-background px-2 text-sm text-muted-foreground">または</span>
+              <span
+                style={{
+                  position: "relative",
+                  backgroundColor: "var(--bg-color)",
+                  padding: "0 0.5rem",
+                  fontSize: "0.875rem",
+                  color: "var(--text-muted)",
+                }}
+              >
+                または
+              </span>
             </div>
-            <Button
-              variant="outline"
+            <button
               type="button"
-              className="w-full"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                padding: "0.5rem 1rem",
+                borderRadius: "0.375rem",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                border: "1px solid var(--border-color)",
+                backgroundColor: "transparent",
+                color: "var(--text-color)",
+                cursor: isLoading ? "not-allowed" : "pointer",
+                opacity: isLoading ? 0.5 : 1,
+              }}
             >
               Googleでログイン
-            </Button>
-          </CardContent>
+            </button>
+          </div>
         </form>
-        <CardFooter className="flex flex-col items-center">
-          <p className="text-sm text-muted-foreground">
+        <div
+          style={{
+            padding: "1rem 1.5rem",
+            borderTop: "1px solid var(--border-color)",
+            textAlign: "center",
+          }}
+        >
+          <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>
             アカウントをお持ちでないですか？{" "}
-            <Link href="/register" className="text-primary underline-offset-4 hover:underline">
+            <Link
+              href="/register"
+              style={{
+                color: "var(--primary-color)",
+                textDecoration: "none",
+              }}
+            >
               登録する
             </Link>
           </p>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
-

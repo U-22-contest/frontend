@@ -74,4 +74,3 @@ export async function askAboutStory(novelId: string, question: string) {
     throw error
   }
 }
-

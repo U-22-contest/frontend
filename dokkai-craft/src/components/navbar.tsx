@@ -1,29 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
-import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, BookOpen, Menu, Search, X } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useState, useEffect, useRef } from "react"
 import { ThemeSwitcher } from "./theme-switcher"
 
 // 仮のユーザー認証状態
@@ -31,200 +9,821 @@ const isAuthenticated = true
 
 export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isExploreDropdownOpen, setIsExploreDropdownOpen] = useState(false)
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  const exploreDropdownRef = useRef<HTMLDivElement>(null)
+  const userDropdownRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  // 画面サイズの検出
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    // 初期チェック
+    checkIfMobile()
+
+    // リサイズイベントのリスナー
+    window.addEventListener("resize", checkIfMobile)
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile)
+    }
+  }, [])
+
+  // クリックイベントのハンドラー
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Explore ドロップダウン
+      if (exploreDropdownRef.current && !exploreDropdownRef.current.contains(event.target as Node)) {
+        setIsExploreDropdownOpen(false)
+      }
+
+      // User ドロップダウン
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
+        setIsUserDropdownOpen(false)
+      }
+
+      // モバイルメニュー
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        !(event.target as Element).closest('[data-menu-trigger="true"]')
+      ) {
+        setIsMenuOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
 
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6 md:gap-8 lg:gap-10">
-          <Link href="/" className="flex items-center space-x-2">
-            <BookOpen className="h-6 w-6" />
-            <span className="font-bold text-xl hidden md:inline-block">NovelAI</span>
+    <header
+      style={{
+        borderBottom: "1px solid var(--border-color)",
+        backgroundColor: "var(--bg-translucent)",
+        backdropFilter: "blur(8px)",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "0 1rem",
+          display: "flex",
+          height: "4rem",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "1.5rem",
+          }}
+        >
+          <Link
+            href="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              textDecoration: "none",
+              color: "inherit",
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </svg>
+            <span
+              style={{
+                fontWeight: "bold",
+                fontSize: "1.25rem",
+                display: isMobile ? "none" : "inline-block",
+              }}
+            >
+              NovelAI
+            </span>
           </Link>
 
-          <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>探索</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid gap-3 p-4 w-[400px] md:w-[500px] lg:w-[600px] grid-cols-2">
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="/rankings"
-                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                        >
-                          <div className="mb-2 mt-4 text-lg font-medium">ランキング</div>
-                          <p className="text-sm leading-tight text-muted-foreground">人気の作品をチェック</p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="/new-releases"
-                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                        >
-                          <div className="mb-2 mt-4 text-lg font-medium">新着作品</div>
-                          <p className="text-sm leading-tight text-muted-foreground">最近投稿された作品</p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li className="col-span-2">
-                      <NavigationMenuLink asChild>
-                        <Link
-                          className="group grid h-full w-full select-none grid-cols-4 place-items-center gap-1 rounded-md p-4 no-underline outline-none focus:shadow-md"
-                          href="/genres"
-                        >
-                          {["ファンタジー", "SF", "恋愛", "日常"].map((genre) => (
-                            <div key={genre} className="text-center rounded-md px-3 py-2 hover:bg-muted">
-                              <div className="text-sm font-medium">{genre}</div>
+          <nav
+            style={{
+              display: isMobile ? "none" : "flex",
+            }}
+          >
+            <ul
+              style={{
+                display: "flex",
+                listStyle: "none",
+                margin: 0,
+                padding: 0,
+              }}
+            >
+              <li style={{ position: "relative" }}>
+                <div ref={exploreDropdownRef}>
+                  <button
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      height: "4rem",
+                      padding: "0 1rem",
+                      fontWeight: 500,
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => setIsExploreDropdownOpen(!isExploreDropdownOpen)}
+                  >
+                    探索
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{ marginLeft: "0.25rem" }}
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  {isExploreDropdownOpen && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                        backgroundColor: "var(--bg-color)",
+                        border: "1px solid var(--border-color)",
+                        borderRadius: "0.5rem",
+                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                        width: "500px",
+                        zIndex: 50,
+                        padding: "1rem",
+                      }}
+                    >
+                      <ul
+                        style={{
+                          display: "grid",
+                          gap: "0.75rem",
+                          gridTemplateColumns: "1fr 1fr",
+                        }}
+                      >
+                        <li>
+                          <Link
+                            href="/rankings"
+                            style={{
+                              display: "flex",
+                              height: "100%",
+                              width: "100%",
+                              flexDirection: "column",
+                              justifyContent: "flex-end",
+                              borderRadius: "0.5rem",
+                              background: "linear-gradient(to bottom, var(--bg-muted-50), var(--bg-muted))",
+                              padding: "1.5rem",
+                              textDecoration: "none",
+                              color: "inherit",
+                            }}
+                          >
+                            <div
+                              style={{
+                                marginBottom: "0.5rem",
+                                marginTop: "1rem",
+                                fontSize: "1.125rem",
+                                fontWeight: 500,
+                              }}
+                            >
+                              ランキング
                             </div>
-                          ))}
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/write" legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>執筆する</NavigationMenuLink>
+                            <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>人気の作品をチェック</p>
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/new-releases"
+                            style={{
+                              display: "flex",
+                              height: "100%",
+                              width: "100%",
+                              flexDirection: "column",
+                              justifyContent: "flex-end",
+                              borderRadius: "0.5rem",
+                              background: "linear-gradient(to bottom, var(--bg-muted-50), var(--bg-muted))",
+                              padding: "1.5rem",
+                              textDecoration: "none",
+                              color: "inherit",
+                            }}
+                          >
+                            <div
+                              style={{
+                                marginBottom: "0.5rem",
+                                marginTop: "1rem",
+                                fontSize: "1.125rem",
+                                fontWeight: 500,
+                              }}
+                            >
+                              新着作品
+                            </div>
+                            <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>最近投稿された作品</p>
+                          </Link>
+                        </li>
+                        <li style={{ gridColumn: "span 2" }}>
+                          <Link
+                            href="/genres"
+                            style={{
+                              display: "grid",
+                              height: "100%",
+                              width: "100%",
+                              gridTemplateColumns: "repeat(4, 1fr)",
+                              placeItems: "center",
+                              gap: "0.25rem",
+                              borderRadius: "0.5rem",
+                              padding: "1rem",
+                              textDecoration: "none",
+                              color: "inherit",
+                            }}
+                          >
+                            {["ファンタジー", "SF", "恋愛", "日常"].map((genre) => (
+                              <div
+                                key={genre}
+                                style={{
+                                  textAlign: "center",
+                                  borderRadius: "0.5rem",
+                                  padding: "0.5rem 0.75rem",
+                                }}
+                              >
+                                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{genre}</div>
+                              </div>
+                            ))}
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </li>
+              <li>
+                <Link
+                  href="/write"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    height: "4rem",
+                    padding: "0 1rem",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    color: "inherit",
+                  }}
+                >
+                  執筆する
                 </Link>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+              </li>
+            </ul>
+          </nav>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "1rem",
+          }}
+        >
           {isSearchOpen ? (
-            <div className="flex items-center">
-              <Input type="search" placeholder="作品名、作者名で検索..." className="w-[200px] md:w-[300px]" autoFocus />
-              <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(false)} className="ml-2">
-                <X className="h-4 w-4" />
-              </Button>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <input
+                type="search"
+                placeholder="作品名、作者名で検索..."
+                style={{
+                  width: "300px",
+                  height: "2.5rem",
+                  padding: "0 0.75rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                }}
+                autoFocus
+              />
+              <button
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "2.5rem",
+                  height: "2.5rem",
+                  marginLeft: "0.5rem",
+                  borderRadius: "0.375rem",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  cursor: "pointer",
+                }}
+                onClick={() => setIsSearchOpen(false)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
             </div>
           ) : (
-            <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)}>
-              <Search className="h-4 w-4" />
-            </Button>
+            <button
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "2.5rem",
+                height: "2.5rem",
+                borderRadius: "0.375rem",
+                border: "none",
+                backgroundColor: "transparent",
+                cursor: "pointer",
+              }}
+              onClick={() => setIsSearchOpen(true)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </button>
           )}
 
           <ThemeSwitcher />
 
           {isAuthenticated ? (
             <>
-              <Button variant="ghost" size="icon" className="hidden md:flex">
-                <Bell className="h-4 w-4" />
-              </Button>
+              <button
+                style={{
+                  display: isMobile ? "none" : "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "2.5rem",
+                  height: "2.5rem",
+                  borderRadius: "0.375rem",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  cursor: "pointer",
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                </svg>
+              </button>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="ユーザー" />
-                      <AvatarFallback>ユ</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">ユーザー名</p>
-                      <p className="text-xs leading-none text-muted-foreground">user@example.com</p>
+              <div style={{ position: "relative" }} ref={userDropdownRef}>
+                <button
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "2rem",
+                    height: "2rem",
+                    borderRadius: "9999px",
+                    border: "none",
+                    backgroundColor: "transparent",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                >
+                  <div
+                    style={{
+                      width: "2rem",
+                      height: "2rem",
+                      borderRadius: "9999px",
+                      overflow: "hidden",
+                      backgroundColor: "var(--bg-muted)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <img
+                      src="/placeholder.svg?height=32&width=32"
+                      alt="ユーザー"
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                    <span
+                      style={{
+                        display: "none",
+                        width: "100%",
+                        height: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: 500,
+                      }}
+                    >
+                      ユ
+                    </span>
+                  </div>
+                </button>
+                {isUserDropdownOpen && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      right: 0,
+                      width: "14rem",
+                      backgroundColor: "var(--bg-color)",
+                      border: "1px solid var(--border-color)",
+                      borderRadius: "0.5rem",
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                      zIndex: 50,
+                      marginTop: "0.5rem",
+                    }}
+                  >
+                    <div style={{ padding: "0.75rem 1rem", fontWeight: "normal" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                        <p style={{ fontSize: "0.875rem", fontWeight: 500, lineHeight: "1.25" }}>ユーザー名</p>
+                        <p style={{ fontSize: "0.75rem", lineHeight: "1.25", color: "var(--text-muted)" }}>
+                          user@example.com
+                        </p>
+                      </div>
                     </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Link href="/profile" className="flex w-full">
-                      プロフィール
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/dashboard" className="flex w-full">
-                      ダッシュボード
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/bookmarks" className="flex w-full">
-                      ブックマーク
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>ログアウト</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <div style={{ height: "1px", backgroundColor: "var(--border-color)" }} />
+                    <div style={{ padding: "0.5rem" }}>
+                      <Link
+                        href="/profile"
+                        style={{
+                          display: "block",
+                          padding: "0.5rem 0.75rem",
+                          borderRadius: "0.25rem",
+                          fontSize: "0.875rem",
+                          textDecoration: "none",
+                          color: "inherit",
+                        }}
+                        onClick={() => setIsUserDropdownOpen(false)}
+                      >
+                        プロフィール
+                      </Link>
+                      <Link
+                        href="/dashboard"
+                        style={{
+                          display: "block",
+                          padding: "0.5rem 0.75rem",
+                          borderRadius: "0.25rem",
+                          fontSize: "0.875rem",
+                          textDecoration: "none",
+                          color: "inherit",
+                        }}
+                        onClick={() => setIsUserDropdownOpen(false)}
+                      >
+                        ダッシュボード
+                      </Link>
+                      <Link
+                        href="/bookmarks"
+                        style={{
+                          display: "block",
+                          padding: "0.5rem 0.75rem",
+                          borderRadius: "0.25rem",
+                          fontSize: "0.875rem",
+                          textDecoration: "none",
+                          color: "inherit",
+                        }}
+                        onClick={() => setIsUserDropdownOpen(false)}
+                      >
+                        ブックマーク
+                      </Link>
+                    </div>
+                    <div style={{ height: "1px", backgroundColor: "var(--border-color)" }} />
+                    <div style={{ padding: "0.5rem" }}>
+                      <button
+                        style={{
+                          display: "block",
+                          width: "100%",
+                          textAlign: "left",
+                          padding: "0.5rem 0.75rem",
+                          borderRadius: "0.25rem",
+                          fontSize: "0.875rem",
+                          border: "none",
+                          backgroundColor: "transparent",
+                          cursor: "pointer",
+                          color: "inherit",
+                        }}
+                      >
+                        ログアウト
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
-            <div className="hidden md:flex gap-2">
-              <Button variant="outline" asChild>
-                <Link href="/login">ログイン</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/register">登録</Link>
-              </Button>
+            <div
+              style={{
+                display: isMobile ? "none" : "flex",
+                gap: "0.5rem",
+              }}
+            >
+              <Link
+                href="/login"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "0.375rem",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "transparent",
+                  color: "inherit",
+                  textDecoration: "none",
+                }}
+              >
+                ログイン
+              </Link>
+              <Link
+                href="/register"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "0.375rem",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  backgroundColor: "var(--primary-color)",
+                  color: "var(--primary-foreground)",
+                  textDecoration: "none",
+                  border: "none",
+                }}
+              >
+                登録
+              </Link>
             </div>
           )}
 
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <nav className="flex flex-col gap-4">
-                <Link
-                  href="/"
-                  className="flex items-center text-lg font-semibold"
-                  onClick={() => document.body.classList.remove("overflow-hidden")}
-                >
-                  <BookOpen className="mr-2 h-5 w-5" />
-                  <span>NovelAI</span>
-                </Link>
-                <Link
-                  href="/explore"
-                  className="text-muted-foreground"
-                  onClick={() => document.body.classList.remove("overflow-hidden")}
-                >
-                  作品を探す
-                </Link>
-                <Link
-                  href="/rankings"
-                  className="text-muted-foreground"
-                  onClick={() => document.body.classList.remove("overflow-hidden")}
-                >
-                  ランキング
-                </Link>
-                <Link
-                  href="/write"
-                  className="text-muted-foreground"
-                  onClick={() => document.body.classList.remove("overflow-hidden")}
-                >
-                  執筆する
-                </Link>
-                <Link
-                  href="/dashboard"
-                  className="text-muted-foreground"
-                  onClick={() => document.body.classList.remove("overflow-hidden")}
-                >
-                  ダッシュボード
-                </Link>
-                {!isAuthenticated && (
-                  <div className="flex flex-col gap-2 mt-4">
-                    <Button asChild variant="outline">
-                      <Link href="/login">ログイン</Link>
-                    </Button>
-                    <Button asChild>
-                      <Link href="/register">登録</Link>
-                    </Button>
-                  </div>
-                )}
-              </nav>
-            </SheetContent>
-          </Sheet>
+          <button
+            style={{
+              display: isMobile ? "flex" : "none",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "2.5rem",
+              height: "2.5rem",
+              borderRadius: "0.375rem",
+              border: "none",
+              backgroundColor: "transparent",
+              cursor: "pointer",
+            }}
+            onClick={() => setIsMenuOpen(true)}
+            data-menu-trigger="true"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="4" x2="20" y1="12" y2="12" />
+              <line x1="4" x2="20" y1="6" y2="6" />
+              <line x1="4" x2="20" y1="18" y2="18" />
+            </svg>
+          </button>
         </div>
       </div>
+
+      {/* モバイルメニュー */}
+      {isMenuOpen && (
+        <div
+          ref={menuRef}
+          style={{
+            position: "fixed",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: "100%",
+            maxWidth: "24rem",
+            backgroundColor: "var(--bg-color)",
+            boxShadow: "-4px 0 6px -1px rgba(0, 0, 0, 0.1)",
+            zIndex: 100,
+            padding: "1.5rem",
+            overflowY: "auto",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "2rem",
+            }}
+          >
+            <Link
+              href="/"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                fontSize: "1.25rem",
+                fontWeight: 600,
+                textDecoration: "none",
+                color: "inherit",
+              }}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+              <span>NovelAI</span>
+            </Link>
+            <button
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "2.5rem",
+                height: "2.5rem",
+                borderRadius: "0.375rem",
+                border: "none",
+                backgroundColor: "transparent",
+                cursor: "pointer",
+              }}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <nav style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <Link
+              href="/explore"
+              style={{
+                fontSize: "1rem",
+                color: "var(--text-muted)",
+                textDecoration: "none",
+              }}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              作品を探す
+            </Link>
+            <Link
+              href="/rankings"
+              style={{
+                fontSize: "1rem",
+                color: "var(--text-muted)",
+                textDecoration: "none",
+              }}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              ランキング
+            </Link>
+            <Link
+              href="/write"
+              style={{
+                fontSize: "1rem",
+                color: "var(--text-muted)",
+                textDecoration: "none",
+              }}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              執筆する
+            </Link>
+            <Link
+              href="/dashboard"
+              style={{
+                fontSize: "1rem",
+                color: "var(--text-muted)",
+                textDecoration: "none",
+              }}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              ダッシュボード
+            </Link>
+            {!isAuthenticated && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.5rem",
+                  marginTop: "1rem",
+                }}
+              >
+                <Link
+                  href="/login"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "0.375rem",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    border: "1px solid var(--border-color)",
+                    backgroundColor: "transparent",
+                    color: "inherit",
+                    textDecoration: "none",
+                  }}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  ログイン
+                </Link>
+                <Link
+                  href="/register"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "0.375rem",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    backgroundColor: "var(--primary-color)",
+                    color: "var(--primary-foreground)",
+                    textDecoration: "none",
+                    border: "none",
+                  }}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  登録
+                </Link>
+              </div>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   )
 }
-
