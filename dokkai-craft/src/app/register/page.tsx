@@ -37,7 +37,7 @@ export default function RegisterPage() {
 
       alert("登録が完了しました: ログインしてサービスをご利用ください")
       router.push("/login")
-    } catch (error) {
+    } catch {
       alert("エラーが発生しました: 後でもう一度お試しください")
     } finally {
       setIsLoading(false)

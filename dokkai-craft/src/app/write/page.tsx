@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import styles from "./page.module.css"
 
 export default function WritePage() {
   const [title, setTitle] = useState("")
@@ -37,7 +38,7 @@ export default function WritePage() {
       ]
 
       setAiSuggestions(mockSuggestions)
-    } catch (error) {
+    } catch {
       alert("エラーが発生しました: AIサービスに接続できませんでした。後でもう一度お試しください。")
     } finally {
       setIsGenerating(false)
@@ -65,7 +66,7 @@ export default function WritePage() {
       ]
 
       setAiSuggestions(mockSuggestions)
-    } catch (error) {
+    } catch {
       alert("エラーが発生しました: AIサービスに接続できませんでした。後でもう一度お試しください。")
     } finally {
       setIsGenerating(false)
@@ -96,17 +97,8 @@ export default function WritePage() {
   }
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem 1rem" }}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "1.5rem",
-          "@media (min-width: 1024px)": {
-            flexDirection: "row",
-          },
-        }}
-      >
+    <div className={styles.container}>
+      <div className={styles.editorContainer}>
         <div style={{ flex: 1 }}>
           <div style={{ marginBottom: "1.5rem" }}>
             <input
@@ -406,14 +398,7 @@ export default function WritePage() {
         </div>
 
         {aiSuggestions.length > 0 && (
-          <div
-            style={{
-              width: "100%",
-              "@media (min-width: 1024px)": {
-                width: "33.333333%",
-              },
-            }}
-          >
+          <div className={styles.suggestionsContainer}>
             <div
               style={{
                 backgroundColor: "var(--bg-color)",

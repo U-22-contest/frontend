@@ -1,0 +1,27 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.editorContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .editorContainer {
+        flex-direction: row;
+    }
+}
+
+.suggestionsContainer {
+    width: 100%;
+}
+
+@media (min-width: 1024px) {
+    .suggestionsContainer {
+        width: 33.333333%;
+    }
+}
