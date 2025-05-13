@@ -13,8 +13,31 @@ const overviewData = {
   aiUsage: 76, // AI提案の活用率（%）
 }
 
+// データ型の定義
+type BaseChartDataItem = {
+  name: string
+}
+
+type ChartDataItem = BaseChartDataItem & {
+  [key: string]: string | number // nameプロパティと他のプロパティを許容
+}
+
+type ViewsDataItem = BaseChartDataItem & {
+  views: number
+}
+
+type EngagementDataItem = BaseChartDataItem & {
+  likes: number
+  comments: number
+}
+
+type AiUsageDataItem = BaseChartDataItem & {
+  value: number
+  color: string
+}
+
 // 閲覧数のモックデータ - 将来的に実際のAPIからのデータに置き換え可能
-const viewsData = [
+const viewsData: ViewsDataItem[] = [
   { name: "1月", views: 3200 },
   { name: "2月", views: 3800 },
   { name: "3月", views: 4100 },
@@ -30,7 +53,7 @@ const viewsData = [
 ]
 
 // エンゲージメントのモックデータ - 将来的に実際のAPIからのデータに置き換え可能
-const engagementData = [
+const engagementData: EngagementDataItem[] = [
   { name: "1月", likes: 240, comments: 80 },
   { name: "2月", likes: 280, comments: 95 },
   { name: "3月", likes: 310, comments: 105 },
@@ -46,7 +69,7 @@ const engagementData = [
 ]
 
 // AI活用状況のモックデータ - 将来的に実際のAPIからのデータに置き換え可能
-const aiUsageData = [
+const aiUsageData: AiUsageDataItem[] = [
   { name: "文章補完", value: 45, color: "#0088FE" },
   { name: "描写提案", value: 30, color: "#00C49F" },
   { name: "プロット提案", value: 15, color: "#FFBB28" },
@@ -97,10 +120,30 @@ const novelPerformanceData = [
   },
 ]
 
+type SimpleLineChartProps = {
+  data: ViewsDataItem[] // より具体的な型を使用
+  dataKey: "views" // リテラル型で制限
+  height?: number
+}
+
+type SimpleBarChartProps = {
+  data: EngagementDataItem[] // より具体的な型を使用
+  keys: Array<"likes" | "comments"> // リテラル型のユニオンで制限
+  height?: number
+  colors?: string[]
+}
+
+type SimplePieChartProps = {
+  data: AiUsageDataItem[]
+  dataKey: "value" // リテラル型で制限
+  nameKey: "name" // リテラル型で制限
+  height?: number
+}
+
 // シンプルな折れ線グラフコンポーネント
-const SimpleLineChart = ({ data, dataKey, height = 300 }) => {
+const SimpleLineChart = ({ data, dataKey, height = 300 }: SimpleLineChartProps) => {
   // データの最大値を計算
-  const maxValue = Math.max(...data.map((item) => item[dataKey])) * 1.1 // 10%余裕を持たせる
+  const maxValue = Math.max(...data.map((item) => item.views)) * 1.1 // 10%余裕を持たせる
 
   return (
     <div style={{ height: `${height}px`, position: "relative", padding: "20px 40px 20px 60px" }}>
@@ -144,7 +187,7 @@ const SimpleLineChart = ({ data, dataKey, height = 300 }) => {
         {/* データポイント */}
         <div style={{ position: "relative", height: "100%", display: "flex", alignItems: "flex-end" }}>
           {data.map((item, index) => {
-            const height = (item[dataKey] / maxValue) * 100
+            const height = (item.views / maxValue) * 100
             return (
               <div
                 key={index}
@@ -183,7 +226,7 @@ const SimpleLineChart = ({ data, dataKey, height = 300 }) => {
 }
 
 // シンプルな棒グラフコンポーネント
-const SimpleBarChart = ({ data, keys, height = 300, colors = ["var(--primary-color)", "#00C49F"] }) => {
+const SimpleBarChart = ({ data, keys, height = 300, colors = ["var(--primary-color)", "#00C49F"] }: SimpleBarChartProps) => {
   // データの最大値を計算
   let maxValue = 0
   data.forEach((item) => {
@@ -289,9 +332,9 @@ const SimpleBarChart = ({ data, keys, height = 300, colors = ["var(--primary-col
 }
 
 // シンプルな円グラフコンポーネント
-const SimplePieChart = ({ data, dataKey, nameKey, height = 300 }) => {
+const SimplePieChart = ({ data, dataKey, nameKey, height = 300 }: SimplePieChartProps) => {
   // 合計値を計算
-  const total = data.reduce((sum, item) => sum + item[dataKey], 0)
+  const total = data.reduce((sum, item) => sum + item.value, 0)
 
   // 累積角度を追跡
   let cumulativeAngle = 0
@@ -309,7 +352,7 @@ const SimplePieChart = ({ data, dataKey, nameKey, height = 300 }) => {
       {/* 円グラフ */}
       <div style={{ width: "200px", height: "200px", position: "relative", borderRadius: "50%", overflow: "hidden" }}>
         {data.map((item, index) => {
-          const percentage = (item[dataKey] / total) * 100
+          const percentage = (item.value / total) * 100
           const angle = (percentage / 100) * 360
           const oldAngle = cumulativeAngle
           cumulativeAngle += angle
@@ -345,7 +388,7 @@ const SimplePieChart = ({ data, dataKey, nameKey, height = 300 }) => {
           <div key={index} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
             <div style={{ width: "12px", height: "12px", backgroundColor: item.color, borderRadius: "2px" }} />
             <span style={{ fontSize: "12px" }}>
-              {item[nameKey]} ({Math.round((item[dataKey] / total) * 100)}%)
+              {item[nameKey]} ({Math.round((item.value / total) * 100)}%)
             </span>
           </div>
         ))}

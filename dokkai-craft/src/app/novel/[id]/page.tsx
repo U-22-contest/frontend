@@ -172,9 +172,13 @@ const Avatar = ({
         src={src || "/placeholder.svg"}
         alt={alt}
         style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        onError={(e) => {
-          e.currentTarget.style.display = "none"
-          e.currentTarget.nextElementSibling!.style.display = "flex"
+        onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+          const target = e.currentTarget as HTMLImageElement
+          target.style.display = "none"
+          const nextSibling = target.nextElementSibling as HTMLDivElement
+          if (nextSibling) {
+            nextSibling.style.display = "flex"
+          }
         }}
       />
       <div
@@ -368,14 +372,34 @@ const Dialog = ({
   )
 }
 
+// タブコンポーネントの型定義
+type TabTriggerProps = {
+  children: React.ReactNode
+  value: string
+  isActive?: boolean
+  onClick?: () => void
+}
+
+type TabsContentProps = {
+  children: React.ReactNode
+  value: string
+  isActive?: boolean
+}
+
+type TabsListProps = {
+  children: React.ReactElement<TabTriggerProps>[]
+}
+
+type TabsProps = {
+  children: React.ReactElement<TabsListProps | TabsContentProps>[]
+  defaultValue: string
+}
+
 // タブコンポーネント
 const Tabs = ({
   children,
   defaultValue,
-}: {
-  children: React.ReactNode
-  defaultValue: string
-}) => {
+}: TabsProps) => {
   const [activeTab, setActiveTab] = useState(defaultValue)
 
   // タブの子要素を処理
@@ -383,24 +407,28 @@ const Tabs = ({
   const tabContents: React.ReactElement[] = []
 
   React.Children.forEach(children, (child) => {
-    if (React.isValidElement(child)) {
+    if (React.isValidElement<TabsListProps | TabsContentProps>(child)) {
       if (child.type === TabsList) {
+        const listChild = child as React.ReactElement<TabsListProps>
         // TabsListの子要素（TabTrigger）を処理
-        const triggers = React.Children.map(child.props.children, (trigger) => {
-          if (React.isValidElement(trigger) && trigger.type === TabTrigger) {
-            return React.cloneElement(trigger, {
+        const triggers = React.Children.map(listChild.props.children, (trigger) => {
+          if (React.isValidElement<TabTriggerProps>(trigger) && trigger.type === TabTrigger) {
+            return React.cloneElement<TabTriggerProps>(trigger, {
               isActive: trigger.props.value === activeTab,
               onClick: () => setActiveTab(trigger.props.value),
             })
           }
           return trigger
         })
-        tabTriggers.push(React.cloneElement(child, {}, triggers))
+        if (triggers) {
+          tabTriggers.push(React.cloneElement(listChild, {}, triggers))
+        }
       } else if (child.type === TabsContent) {
+        const contentChild = child as React.ReactElement<TabsContentProps>
         // TabsContentを処理
         tabContents.push(
-          React.cloneElement(child, {
-            isActive: child.props.value === activeTab,
+          React.cloneElement<TabsContentProps>(contentChild, {
+            isActive: contentChild.props.value === activeTab,
           }),
         )
       }
@@ -415,7 +443,7 @@ const Tabs = ({
   )
 }
 
-const TabsList = ({ children }: { children: React.ReactNode }) => {
+const TabsList = ({ children }: TabsListProps) => {
   return (
     <div
       style={{
@@ -434,12 +462,7 @@ const TabTrigger = ({
   value,
   isActive,
   onClick,
-}: {
-  children: React.ReactNode
-  value: string
-  isActive?: boolean
-  onClick?: () => void
-}) => {
+}: TabTriggerProps) => {
   return (
     <button
       style={{
@@ -463,11 +486,7 @@ const TabsContent = ({
   children,
   value,
   isActive,
-}: {
-  children: React.ReactNode
-  value: string
-  isActive?: boolean
-}) => {
+}: TabsContentProps) => {
   if (!isActive) return null
   return <div>{children}</div>
 }
