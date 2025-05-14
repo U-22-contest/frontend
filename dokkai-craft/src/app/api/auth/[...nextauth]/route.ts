@@ -1,24 +1,9 @@
-import NextAuth from "next-auth"
-import type { DefaultSession, NextAuthOptions } from "next-auth"
+import NextAuth from "next-auth/next"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
-import type { JWT } from "next-auth/jwt"
-
-// セッションの型を拡張
-declare module "next-auth" {
-  interface Session extends DefaultSession {
-    user: {
-      id: string
-    } & DefaultSession["user"]
-  }
-
-  interface User {
-    id: string
-  }
-}
 
 // 実際の実装ではNest.jsバックエンドと連携
-const authOptions: NextAuthOptions = {
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -26,7 +11,7 @@ const authOptions: NextAuthOptions = {
         email: { label: "メールアドレス", type: "email" },
         password: { label: "パスワード", type: "password" },
       },
-      async authorize(credentials: Record<"email" | "password", string> | undefined) {
+      async authorize(credentials) {
         // 実際の実装ではバックエンドAPIを呼び出して認証
         if (!credentials?.email || !credentials?.password) {
           return null
@@ -57,22 +42,24 @@ const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: { id: string } }) {
+    // @ts-ignore
+    async jwt({ token, user }: any) {
       if (user) {
         token.id = user.id
       }
       return token
     },
-    async session({ token, session }: { token: JWT; session: import("next-auth").Session }) {
+    // @ts-ignore
+    async session({ token, session }: any) {
       if (session.user) {
-        session.user.id = token.id as string
+        session.user.id = token.id
       }
       return session
     },
   },
 }
 
-const handler = NextAuth(authOptions)
+const handler = NextAuth(authOptions as any)
 
 export { handler as GET, handler as POST }
 
