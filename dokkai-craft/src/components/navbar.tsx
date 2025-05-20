@@ -4,11 +4,12 @@ import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { ThemeSwitcher } from "./theme-switcher"
 import Image from "next/image"
+import { useRouter } from "next/navigation";
 
 // 仮のユーザー認証状態
 const isAuthenticated = true
 
-export default function Navbar() {
+export default function Navbar() {const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isExploreDropdownOpen, setIsExploreDropdownOpen] = useState(false)
@@ -543,22 +544,29 @@ export default function Navbar() {
                     </div>
                     <div style={{ height: "1px", backgroundColor: "var(--border-color)" }} />
                     <div style={{ padding: "0.5rem" }}>
-                      <button
-                        style={{
-                          display: "block",
-                          width: "100%",
-                          textAlign: "left",
-                          padding: "0.5rem 0.75rem",
-                          borderRadius: "0.25rem",
-                          fontSize: "0.875rem",
-                          border: "none",
-                          backgroundColor: "transparent",
-                          cursor: "pointer",
-                          color: "inherit",
-                        }}
-                      >
-                        ログアウト
-                      </button>
+                        <button
+                            style={{
+                                display: "block",
+                                width: "100%",
+                                textAlign: "left",
+                                padding: "0.5rem 0.75rem",
+                                borderRadius: "0.25rem",
+                                fontSize: "0.875rem",
+                                border: "none",
+                                backgroundColor: "transparent",
+                                cursor: "pointer",
+                                color: "inherit",
+                            }}
+                            onClick={() => {
+                                // ログアウト処理（仮）→ 必要に応じて実装
+                                // ここにトークン削除処理などを挿入
+
+                                setIsUserDropdownOpen(false); // メニューを閉じる
+                                router.push("/login"); // ← ログイン画面に遷移
+                            }}
+                        >
+                            ログアウト
+                        </button>
                     </div>
                   </div>
                 )}
