@@ -62,6 +62,7 @@ export function ThemeSwitcher() {
           border: "none",
           backgroundColor: "transparent",
           cursor: "pointer",
+            color: "var(--icon-color)",
         }}
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
@@ -164,6 +165,7 @@ export function ThemeSwitcher() {
                 backgroundColor: "transparent",
                 cursor: "pointer",
                 textAlign: "left",
+                  color: "var(--icon-color)",
               }}
             >
               <svg
@@ -203,6 +205,7 @@ export function ThemeSwitcher() {
                 backgroundColor: "transparent",
                 cursor: "pointer",
                 textAlign: "left",
+                  color: "var(--icon-color)",
               }}
             >
               <svg
@@ -234,6 +237,7 @@ export function ThemeSwitcher() {
                 backgroundColor: "transparent",
                 cursor: "pointer",
                 textAlign: "left",
+                  color: "var(--icon-color)",
               }}
             >
               <svg
