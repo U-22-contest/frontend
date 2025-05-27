@@ -152,6 +152,7 @@ export default function Navbar() {const router = useRouter();
                       background: "none",
                       border: "none",
                       cursor: "pointer",
+                        color: "var(--icon-color)",
                     }}
                     onClick={() => setIsExploreDropdownOpen(!isExploreDropdownOpen)}
                   >
@@ -341,6 +342,7 @@ export default function Navbar() {const router = useRouter();
                   border: "none",
                   backgroundColor: "transparent",
                   cursor: "pointer",
+                    color: "var(--icon-color)",
                 }}
                 onClick={() => setIsSearchOpen(false)}
               >
@@ -361,7 +363,7 @@ export default function Navbar() {const router = useRouter();
               </button>
             </div>
           ) : (
-            <button
+            <button //検索アイコン
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -372,6 +374,7 @@ export default function Navbar() {const router = useRouter();
                 border: "none",
                 backgroundColor: "transparent",
                 cursor: "pointer",
+                  color: "var(--icon-color)",
               }}
               onClick={() => setIsSearchOpen(true)}
             >
@@ -396,7 +399,7 @@ export default function Navbar() {const router = useRouter();
 
           {isAuthenticated ? (
             <>
-              <button
+              <button //ベルマーク
                 style={{
                   display: isMobile ? "none" : "flex",
                   alignItems: "center",
@@ -407,6 +410,7 @@ export default function Navbar() {const router = useRouter();
                   border: "none",
                   backgroundColor: "transparent",
                   cursor: "pointer",
+                    color: "var(--icon-color)",
                 }}
               >
                 <svg
