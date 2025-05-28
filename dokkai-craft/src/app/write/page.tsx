@@ -183,6 +183,7 @@ export default function WritePage() {
                     border: "1px solid var(--border-color)",
                     backgroundColor: "transparent",
                     cursor: "pointer",
+                      color: "var(--icon-color)"
                   }}
                   onMouseEnter={() => setIsTooltipVisible(true)}
                   onMouseLeave={() => setIsTooltipVisible(false)}
