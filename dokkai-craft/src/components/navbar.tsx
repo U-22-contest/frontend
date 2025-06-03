@@ -622,7 +622,7 @@ export default function Navbar() {const router = useRouter();
             </div>
           )}
 
-          <button
+          <button //ハンバーガー
             style={{
               display: isMobile ? "flex" : "none",
               alignItems: "center",
@@ -633,6 +633,7 @@ export default function Navbar() {const router = useRouter();
               border: "none",
               backgroundColor: "transparent",
               cursor: "pointer",
+                color: "var(--icon-color)",
             }}
             onClick={() => setIsMenuOpen(true)}
             data-menu-trigger="true"
@@ -722,6 +723,7 @@ export default function Navbar() {const router = useRouter();
                 border: "none",
                 backgroundColor: "transparent",
                 cursor: "pointer",
+                  color: "var(--icon-color)",
               }}
               onClick={() => setIsMenuOpen(false)}
             >
