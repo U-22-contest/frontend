@@ -622,7 +622,7 @@ export default function Navbar() {const router = useRouter();
             </div>
           )}
 
-          <button
+          <button //ハンバーガー
             style={{
               display: isMobile ? "flex" : "none",
               alignItems: "center",
