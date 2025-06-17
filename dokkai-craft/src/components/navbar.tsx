@@ -453,7 +453,7 @@ export default function Navbar() {
                     }}
                   >
                     <Image
-                      src="/placeholder.svg?height=32&width=32"
+                      src="/images/default-avatar.png"
                       alt="ユーザーアイコン"
                       width={32}
                       height={32}

@@ -1,110 +1,9 @@
 "use client"
 
-import React from "react"
-
-import { useState, useRef, useEffect } from "react"
-
-// 小説のモックデータ
-const novelData = {
-  id: 1,
-  title: "異世界転生物語",
-  author: "山田太郎",
-  authorId: "yamada123",
-  genre: "ファンタジー",
-  views: 12500,
-  likes: 843,
-  bookmarks: 256,
-  publishedAt: "2023-10-15",
-  updatedAt: "2023-11-20",
-  chapters: [
-    { id: 1, title: "第1章: 異世界への扉", published: true },
-    { id: 2, title: "第2章: 新たな冒険の始まり", published: true },
-    { id: 3, title: "第3章: 仲間との出会い", published: true },
-    { id: 4, title: "第4章: 最初の試練", published: false },
-  ],
-  content: `
-    「これは、一体どこだ？」
-
-    目を覚ますと、そこは見知らぬ森の中だった。高い木々が空を覆い、木漏れ日が地面に模様を描いている。昨日までオフィスで残業していたはずなのに、気がつけば異世界らしき場所に立っていた。
-
-    私の名前は佐藤健太、27歳の平凡なサラリーマンだ。特別な才能もなく、特別な人生を送ってきたわけでもない。そんな私がなぜこんな場所にいるのか、まったく見当がつかなかった。
-
-    「とりあえず、このままじゃ何も始まらない」
-
-    私は立ち上がり、辺りを見回した。どの方向に進めばいいのか分からなかったが、一番光が差し込んでいる方向に歩き始めた。
-
-    森の中を歩くこと約1時間。ようやく開けた場所に出ると、そこには小さな村が見えた。中世ヨーロッパを思わせる石造りの家々と、行き交う人々の服装。どう見ても現代の日本ではない。
-
-    「やはり異世界か...」
-
-    村の入り口に立つと、不思議そうな目で見られた。当然だろう、この世界の服装とはかけ離れたスーツ姿なのだから。
-
-    「おや、珍しい服装の方だね。どちらからいらしたのかな？」
-
-    声をかけてきたのは、年配の男性だった。白髪交じりの髪に優しい表情。村の長のような雰囲気を漂わせている。
-
-    「実は...どこからきたのか、自分でもよく分からないんです」
-
-    正直に答えると、男性は驚いた様子で私を見つめた。
-
-    「記憶喪失か...それとも召喚された者か。いずれにせよ、まずは休むといい。私の家においで」
-
-    男性の名前はガルム。この村の長老だという。彼の家で暖かい食事をいただきながら、この世界のことを少しずつ教えてもらった。
-
-    ここはアルテミア大陸の小さな村、ウィンドベルという場所。魔法が存在し、モンスターが出没する、まさに異世界ファンタジーそのものの世界だった。
-
-    「それにしても、健太くんは特別な雰囲気を持っているね」
-
-    ガルムはそう言って、私の右手を指さした。気づくと、手の甲に見覚えのない紋章のようなものが浮かび上がっていた。青く光る三角形の紋章。
-
-    「これは...勇者の証だ！」
-
-    ガルムの声が震えた。どうやら私は、この世界を救うために召喚された「勇者」らしい。平凡だったはずの人生が、一変する瞬間だった。
-  `,
-  comments: [
-    {
-      id: 1,
-      user: { name: "読者A", avatar: "/placeholder.svg?height=40&width=40" },
-      text: "主人公の心情描写がとても良いです！続きが楽しみです。",
-      likes: 12,
-      createdAt: "2023-11-21T10:30:00Z",
-    },
-    {
-      id: 2,
-      user: { name: "読者B", avatar: "/placeholder.svg?height=40&width=40" },
-      text: "異世界ものですが、新鮮な設定が面白いです。",
-      likes: 8,
-      createdAt: "2023-11-22T14:15:00Z",
-    },
-  ],
-  // 文単位のコメントを追加
-  sentenceComments: [
-    {
-      id: 1,
-      sentenceIndex: 3, // 「目を覚ますと、そこは見知らぬ森の中だった。」
-      user: { name: "読者C", avatar: "/placeholder.svg?height=40&width=40" },
-      text: "この森の描写がもう少し詳しいと雰囲気が伝わりそうです！",
-      likes: 5,
-      createdAt: "2023-11-23T09:15:00Z",
-    },
-    {
-      id: 2,
-      sentenceIndex: 15, // 「やはり異世界か...」
-      user: { name: "読者D", avatar: "/placeholder.svg?height=40&width=40" },
-      text: "ここでの主人公の冷静さが印象的です。パニックにならないのが面白い！",
-      likes: 7,
-      createdAt: "2023-11-24T11:20:00Z",
-    },
-    {
-      id: 3,
-      sentenceIndex: 25, // 「ここはアルテミア大陸の小さな村、ウィンドベルという場所。」
-      user: { name: "読者E", avatar: "/placeholder.svg?height=40&width=40" },
-      text: "この世界の名前が素敵です。アルテミアという名前にはどんな由来があるのでしょうか？",
-      likes: 3,
-      createdAt: "2023-11-25T14:30:00Z",
-    },
-  ],
-}
+import React, { useState, useRef, useEffect } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { useParams } from "next/navigation"
 
 // 文を分割する関数
 function splitIntoSentences(text: string): string[] {
@@ -442,6 +341,8 @@ const Avatar = ({
     large: { width: "64px", height: "64px", fontSize: "24px" },
   }
 
+  const [imgError, setImgError] = useState(false)
+
   return (
     <div
       style={{
@@ -452,34 +353,33 @@ const Avatar = ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        position: "relative",
       }}
     >
-      <img
-        src={src || "/placeholder.svg"}
-        alt={alt}
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        onError={(e) => {
-          const target = e.currentTarget as HTMLImageElement;
-          target.style.display = "none";
-          const nextSibling = target.nextElementSibling as HTMLDivElement;
-          if (nextSibling) {
-            nextSibling.style.display = "flex";
-          }
-        }}
-      />
-      <div
-        style={{
-          display: "none",
-          width: "100%",
-          height: "100%",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: 500,
-          color: "#64748b",
-        }}
-      >
-        {fallback}
-      </div>
+      {!imgError ? (
+        <Image
+          src={src || "/placeholder.svg"}
+          alt={alt}
+          fill
+          sizes={`${Number.parseInt(sizeStyles[size].width)}px`}
+          style={{ objectFit: "cover" }}
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: 500,
+            color: "#64748b",
+          }}
+        >
+          {fallback}
+        </div>
+      )}
     </div>
   )
 }
@@ -673,25 +573,24 @@ const Dialog = ({
   )
 }
 
-// 型定義を追加
+// タブコンポーネント
 interface TabTriggerProps {
-  value: string;
-  isActive?: boolean;
-  onClick?: () => void;
-  children: React.ReactNode;
+  value: string
+  children: React.ReactNode
+  isActive?: boolean
+  onClick?: () => void
 }
 
 interface TabsContentProps {
-  value: string;
-  isActive?: boolean;
-  children: React.ReactNode;
+  value: string
+  children: React.ReactNode
+  isActive?: boolean
 }
 
 interface TabsListProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
-// タブコンポーネント
 const Tabs = ({
   children,
   defaultValue,
@@ -706,30 +605,29 @@ const Tabs = ({
   const tabContents: React.ReactElement[] = []
 
   React.Children.forEach(children, (child) => {
-    if (React.isValidElement(child)) {
+    if (React.isValidElement<TabsListProps>(child)) {
       if (child.type === TabsList) {
-        const listProps = child.props as TabsListProps;
-        const triggers = React.Children.map(listProps.children, (trigger) => {
-          if (React.isValidElement(trigger) && trigger.type === TabTrigger) {
-            const triggerProps = trigger.props as TabTriggerProps;
+        // TabsListの子要素（TabTrigger）を処理
+        const triggers = React.Children.map(child.props.children, (trigger) => {
+          if (React.isValidElement<TabTriggerProps>(trigger) && trigger.type === TabTrigger) {
             return React.cloneElement(trigger, {
-              isActive: triggerProps.value === activeTab,
-              onClick: () => setActiveTab(triggerProps.value),
-            } as Partial<TabTriggerProps>);
+              isActive: trigger.props.value === activeTab,
+              onClick: () => setActiveTab(trigger.props.value),
+            })
           }
-          return trigger;
-        });
-        tabTriggers.push(React.cloneElement(child, {}, triggers));
-      } else if (child.type === TabsContent) {
-        const contentProps = child.props as TabsContentProps;
+          return trigger
+        })
+        tabTriggers.push(React.cloneElement(child, {}, triggers))
+      } else if (React.isValidElement<TabsContentProps>(child) && child.type === TabsContent) {
+        // TabsContentを処理
         tabContents.push(
           React.cloneElement(child, {
-            isActive: contentProps.value === activeTab,
-          } as Partial<TabsContentProps>)
-        );
+            isActive: child.props.value === activeTab,
+          }),
+        )
       }
     }
-  });
+  })
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
@@ -828,1000 +726,439 @@ const Textarea = ({
   )
 }
 
-export default function NovelPage({ params }: { params: { id: string } }) {
-  const [liked, setLiked] = useState(false)
-  const [bookmarked, setBookmarked] = useState(false)
-  const [selectedText, setSelectedText] = useState("")
-  const [commentText, setCommentText] = useState("")
-  const [questionText, setQuestionText] = useState("")
-  const [aiResponse, setAiResponse] = useState("")
-  const [isAiLoading, setIsAiLoading] = useState(false)
+// 小説のモックデータ
+const novelData = {
+  id: 1,
+  title: "異世界転生物語",
+  author: "山田太郎",
+  authorId: "yamada123",
+  genre: "ファンタジー",
+  views: 12500,
+  likes: 843,
+  bookmarks: 256,
+  publishedAt: "2023-10-15",
+  updatedAt: "2023-11-20",
+  chapters: [
+    { id: 1, title: "第1章: 異世界への扉", published: true },
+    { id: 2, title: "第2章: 新たな冒険の始まり", published: true },
+    { id: 3, title: "第3章: 仲間との出会い", published: true },
+    { id: 4, title: "第4章: 最初の試練", published: false },
+  ],
+  content: `
+    「これは、一体どこだ？」
 
-  // 新しい状態
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [showComments, setShowComments] = useState(true)
-  const [selectedSentenceIndex, setSelectedSentenceIndex] = useState<number | null>(null)
-  const [sentenceCommentText, setSentenceCommentText] = useState("")
-  const [theme, setTheme] = useState<"light" | "dark" | "sepia">("light")
-  const [isVerticalMode, setIsVerticalMode] = useState(false)
-  const [currentPage, setCurrentPage] = useState(0)
+    目を覚ますと、そこは見知らぬ森の中だった。高い木々が空を覆い、木漏れ日が地面に模様を描いている。昨日までオフィスで残業していたはずなのに、気がつけば異世界らしき場所に立っていた。
 
-  // ダイアログの状態
-  const [isSentenceCommentDialogOpen, setIsSentenceCommentDialogOpen] = useState(false)
-  const [isTextCommentDialogOpen, setIsTextCommentDialogOpen] = useState(false)
-  const [isAiQuestionDialogOpen, setIsAiQuestionDialogOpen] = useState(false)
+    私の名前は佐藤健太、27歳の平凡なサラリーマンだ。特別な才能もなく、特別な人生を送ってきたわけでもない。そんな私がなぜこんな場所にいるのか、まったく見当がつかなかった。
 
-  const contentRef = useRef<HTMLDivElement>(null)
-  const sentences = splitIntoSentences(novelData.content)
+    「とりあえず、このままじゃ何も始まらない」
 
-  // 縦書きモードでのページ数を計算
-  const [totalPages, setTotalPages] = useState(1)
-  const contentContainerRef = useRef<HTMLDivElement>(null)
+    私は立ち上がり、辺りを見回した。どの方向に進めばいいのか分からなかったが、一番光が差し込んでいる方向に歩き始めた。
 
-  // テーマの適用
+    森の中を歩くこと約1時間。ようやく開けた場所に出ると、そこには小さな村が見えた。中世ヨーロッパを思わせる石造りの家々と、行き交う人々の服装。どう見ても現代の日本ではない。
+
+    「やはり異世界か...」
+
+    村の入り口に立つと、不思議そうな目で見られた。当然だろう、この世界の服装とはかけ離れたスーツ姿なのだから。
+
+    「おや、珍しい服装の方だね。どちらからいらしたのかな？」
+
+    声をかけてきたのは、年配の男性だった。白髪交じりの髪に優しい表情。村の長のような雰囲気を漂わせている。
+
+    「実は...どこからきたのか、自分でもよく分からないんです」
+
+    正直に答えると、男性は驚いた様子で私を見つめた。
+
+    「記憶喪失か...それとも召喚された者か。いずれにせよ、まずは休むといい。私の家においで」
+
+    男性の名前はガルム。この村の長老だという。彼の家で暖かい食事をいただきながら、この世界のことを少しずつ教えてもらった。
+
+    ここはアルテミア大陸の小さな村、ウィンドベルという場所。魔法が存在し、モンスターが出没する、まさに異世界ファンタジーそのものの世界だった。
+
+    「それにしても、健太くんは特別な雰囲気を持っているね」
+
+    ガルムはそう言って、私の右手を指さした。気づくと、手の甲に見覚えのない紋章のようなものが浮かび上がっていた。青く光る三角形の紋章。
+
+    「これは...勇者の証だ！」
+
+    ガルムの声が震えた。どうやら私は、この世界を救うために召喚された「勇者」らしい。平凡だったはずの人生が、一変する瞬間だった。
+  `,
+  comments: [
+    {
+      id: 1,
+      user: { name: "読者A", avatar: "/placeholder.svg?height=40&width=40" },
+      text: "主人公の心情描写がとても良いです！続きが楽しみです。",
+      likes: 12,
+      createdAt: "2023-11-21T10:30:00Z",
+    },
+    {
+      id: 2,
+      user: { name: "読者B", avatar: "/placeholder.svg?height=40&width=40" },
+      text: "異世界ものですが、新鮮な設定が面白いです。",
+      likes: 8,
+      createdAt: "2023-11-22T14:15:00Z",
+    },
+  ],
+  // 文単位のコメントを追加
+  sentenceComments: [
+    {
+      id: 1,
+      sentenceIndex: 3, // 「目を覚ますと、そこは見知らぬ森の中だった。」
+      user: { name: "読者C", avatar: "/placeholder.svg?height=40&width=40" },
+      text: "この森の描写がもう少し詳しいと雰囲気が伝わりそうです！",
+      likes: 5,
+      createdAt: "2023-11-23T09:15:00Z",
+    },
+    {
+      id: 2,
+      sentenceIndex: 15, // 「やはり異世界か...」
+      user: { name: "読者D", avatar: "/placeholder.svg?height=40&width=40" },
+      text: "ここでの主人公の冷静さが印象的です。パニックにならないのが面白い！",
+      likes: 7,
+      createdAt: "2023-11-24T11:20:00Z",
+    },
+    {
+      id: 3,
+      sentenceIndex: 25, // 「ここはアルテミア大陸の小さな村、ウィンドベルという場所。」
+      user: { name: "読者E", avatar: "/placeholder.svg?height=40&width=40" },
+      text: "この世界の名前が素敵です。アルテミアという名前にはどんな由来があるのでしょうか？",
+      likes: 3,
+      createdAt: "2023-11-25T14:30:00Z",
+    },
+  ],
+}
+
+export default function NovelPage() {
+  const params = useParams()
+  const [loading, setLoading] = useState(true)
+  const [novel, setNovel] = useState(novelData)
+  const [question, setQuestion] = useState("")
+  const [answer, setAnswer] = useState("")
+  const [isAsking, setIsAsking] = useState(false)
+
   useEffect(() => {
-    document.body.className = theme
-  }, [theme])
+    console.log("Novel ID:", params.id)
+    console.log("Current URL:", window.location.pathname)
+    setLoading(false)
+  }, [params.id])
 
-  // 縦書きモードでのページ計算
-  useEffect(() => {
-    if (isVerticalMode && contentContainerRef.current) {
-      const containerWidth = contentContainerRef.current.clientWidth
-      const contentWidth = contentRef.current?.scrollWidth || 0
-      const pages = Math.ceil(contentWidth / containerWidth)
-      setTotalPages(Math.max(1, pages))
+  const handleAskQuestion = async () => {
+    if (!question.trim()) return
 
-      // ページ変更時にスクロール位置を調整
-      if (contentRef.current) {
-        const scrollAmount = currentPage * containerWidth
-        contentRef.current.scrollLeft = scrollAmount
-      }
-    } else {
-      setTotalPages(1)
-      setCurrentPage(0)
-    }
-  }, [isVerticalMode, currentPage, isFullscreen])
-
-  // 次のページへ
-  const nextPage = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage((prev) => prev + 1)
-    }
-  }
-
-  // 前のページへ
-  const prevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage((prev) => prev - 1)
-    }
-  }
-
-  // フルスクリーン切り替え
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch((err) => {
-        alert(`フルスクリーンモードに切り替えられませんでした: ${err.message}`)
-      })
-      setIsFullscreen(true)
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen()
-        setIsFullscreen(false)
-      }
-    }
-  }
-
-  // フルスクリーン状態の監視
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement)
-    }
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange)
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange)
-    }
-  }, [])
-
-  // テキスト選択を処理
-  const handleTextSelect = () => {
-    const selection = window.getSelection()
-    if (selection && selection.toString()) {
-      setSelectedText(selection.toString())
-    }
-  }
-
-  // 文をクリックしたときの処理
-  const handleSentenceClick = (index: number) => {
-    setSelectedSentenceIndex(index)
-  }
-
-  // 文へのコメントを投稿
-  const postSentenceComment = () => {
-    if (!sentenceCommentText.trim() || selectedSentenceIndex === null) {
-      alert("コメントを入力してください。")
-      return
-    }
-
-    // 実際の実装ではバックエンドにデータを送信
-    alert("コメントが投稿されました")
-    setSentenceCommentText("")
-    setSelectedSentenceIndex(null)
-    setIsSentenceCommentDialogOpen(false)
-  }
-
-  // コメントを投稿
-  const postComment = () => {
-    if (!commentText.trim()) {
-      alert("コメントを入力してください。")
-      return
-    }
-
-    // 実際の実装ではバックエンドにデータを送信
-    alert("コメントが投稿されました")
-    setCommentText("")
-    setIsTextCommentDialogOpen(false)
-  }
-
-  // AIに質問
-  const askAI = async () => {
-    if (!questionText.trim()) {
-      alert("質問を入力してください。")
-      return
-    }
-
-    setIsAiLoading(true)
-
+    setIsAsking(true)
     try {
-      // 実際の実装ではFastAPIバックエンドにリクエストを送信
-      // ここではモックデータを使用
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // 実際のアプリではAPIを呼び出す
+      // const response = await askAboutStory(params.id as string, question)
+      // setAnswer(response.answer)
 
-      // 質問に応じたモック回答
-      const mockResponse = `
-        物語の中で「勇者の証」と呼ばれる青い三角形の紋章は、アルテミア大陸の伝説に登場する特別な印です。
-        
-        伝説によると、世界が危機に瀕したとき、異世界から勇者が召喚され、その証として選ばれた者の右手に紋章が現れるとされています。
-        
-        この紋章は単なる印ではなく、持ち主に特別な力を与えると言われています。物語が進むにつれて、主人公の佐藤健太がこの力を発見し、使いこなしていく展開が期待できます。
-      `
-
-      setAiResponse(mockResponse)
+      // モックレスポンス
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      setAnswer(
+        `「${question}」についての回答です。この物語では、主人公の佐藤健太が異世界に召喚され、「勇者の証」と呼ばれる青い三角形の紋章を持つことで、この世界を救う使命を持つことになります。`,
+      )
     } catch (error) {
-      alert("AIサービスに接続できませんでした。後でもう一度お試しください。")
+      console.error("質問の処理中にエラーが発生しました:", error)
+      setAnswer("申し訳ありません。質問の処理中にエラーが発生しました。")
     } finally {
-      setIsAiLoading(false)
+      setIsAsking(false)
     }
   }
 
-  // 特定の文に対するコメントを取得
-  const getSentenceComments = (index: number) => {
-    return novelData.sentenceComments.filter((comment) => comment.sentenceIndex === index)
-  }
-
-  // テーマに応じたスタイルを取得
-  const getThemeStyles = () => {
-    switch (theme) {
-      case "dark":
-        return {
-          backgroundColor: "#1a1a1a",
-          color: "#f0f0f0",
-        }
-      case "sepia":
-        return {
-          backgroundColor: "#f5efe0",
-          color: "#5f4b32",
-        }
-      default:
-        return {
-          backgroundColor: "#ffffff",
-          color: "#333333",
-        }
-    }
-  }
-
-  // 縦書きモードの切り替え
-  const toggleVerticalMode = () => {
-    setIsVerticalMode(!isVerticalMode)
-    setCurrentPage(0) // ページをリセット
+  if (loading) {
+    return (
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem 1rem", textAlign: "center" }}>
+        <p>読み込み中...</p>
+      </div>
+    )
   }
 
   return (
-    <div
-      style={{
-        ...getThemeStyles(),
-        transition: "background-color 0.3s, color 0.3s",
-        padding: isFullscreen ? "0" : "2rem 1rem",
-        margin: isFullscreen ? "0" : "0 auto",
-        maxWidth: isFullscreen ? "none" : "1200px",
-      }}
-    >
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: isFullscreen ? "1fr" : "3fr 1fr",
-          gap: "2rem",
-        }}
-      >
-        <div>
-          {!isFullscreen && (
-            <div style={{ marginBottom: "1.5rem" }}>
-              <h1 style={{ fontSize: "1.875rem", fontWeight: "bold", marginBottom: "0.5rem" }}>{novelData.title}</h1>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-                <a
-                  href={`/author/${novelData.authorId}`}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    textDecoration: "none",
-                    color: "inherit",
-                  }}
-                >
-                  <Avatar
-                    src="/placeholder.svg?height=24&width=24"
-                    alt={novelData.author}
-                    fallback={novelData.author[0]}
-                    size="small"
-                  />
-                  <span style={{ fontSize: "0.875rem", fontWeight: 500 }}>{novelData.author}</span>
-                </a>
-                <span style={{ fontSize: "0.875rem", color: "#6b7280" }}>
-                  {novelData.genre} • 更新: {novelData.updatedAt}
-                </span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                <Button
-                  variant={liked ? "default" : "outline"}
-                  size="small"
-                  onClick={() => setLiked(!liked)}
-                  style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}
-                >
-                  <HeartIcon />
-                  <span>{liked ? novelData.likes + 1 : novelData.likes}</span>
-                </Button>
-                <Button
-                  variant={bookmarked ? "default" : "outline"}
-                  size="small"
-                  onClick={() => setBookmarked(!bookmarked)}
-                  style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}
-                >
-                  <BookmarkIcon />
-                  <span>{bookmarked ? novelData.bookmarks + 1 : novelData.bookmarks}</span>
-                </Button>
-                <Tooltip content="URLをコピーして共有">
-                  <Button
-                    variant="outline"
-                    size="small"
-                    style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}
-                  >
-                    <ShareIcon />
-                    <span>共有</span>
-                  </Button>
-                </Tooltip>
-              </div>
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem 1rem" }}>
+      <div style={{ marginBottom: "2rem" }}>
+        <Link
+          href="/"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            marginBottom: "1rem",
+            color: "var(--text-muted)",
+            textDecoration: "none",
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          ホームに戻る
+        </Link>
+
+        <h1 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "0.5rem" }}>{novel.title}</h1>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
+          <Link
+            href={`/author/${novel.authorId}`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              textDecoration: "none",
+              color: "inherit",
+            }}
+          >
+            <div
+              style={{
+                width: "2rem",
+                height: "2rem",
+                borderRadius: "9999px",
+                backgroundColor: "var(--bg-muted)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 500,
+              }}
+            >
+              {novel.author[0]}
             </div>
-          )}
+            <span style={{ fontWeight: 500 }}>{novel.author}</span>
+          </Link>
+          <span style={{ color: "var(--text-muted)" }}>
+            {novel.genre} • 更新: {novel.updatedAt}
+          </span>
+        </div>
+
+        <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem" }}>
+          <button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.375rem",
+              border: "1px solid var(--border-color)",
+              backgroundColor: "transparent",
+              cursor: "pointer",
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg>
+            <span>いいね {novel.likes}</span>
+          </button>
+
+          <button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.375rem",
+              border: "1px solid var(--border-color)",
+              backgroundColor: "transparent",
+              cursor: "pointer",
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
+            </svg>
+            <span>ブックマーク {novel.bookmarks}</span>
+          </button>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "3fr 1fr", gap: "2rem" }}>
+        <div>
+          <div
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+              padding: "2rem",
+              marginBottom: "2rem",
+            }}
+          >
+            <div
+              style={{
+                whiteSpace: "pre-wrap",
+                lineHeight: 1.8,
+                fontSize: "1.125rem",
+              }}
+            >
+              {novel.content}
+            </div>
+          </div>
 
           <div
             style={{
-              backgroundColor: getThemeStyles().backgroundColor,
-              borderRadius: isFullscreen ? "0" : "0.5rem",
-              border: isFullscreen
-                ? "none"
-                : `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-              boxShadow: isFullscreen ? "none" : "0 1px 3px rgba(0, 0, 0, 0.1)",
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
               overflow: "hidden",
             }}
           >
-            <div style={{ padding: "1.5rem" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
-                {isFullscreen && <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{novelData.title}</h1>}
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginLeft: "auto" }}>
-                  <Tooltip content="テーマ切り替え">
-                    <Button
-                      variant="outline"
-                      size="small"
-                      onClick={() => setTheme(theme === "light" ? "dark" : theme === "dark" ? "sepia" : "light")}
-                    >
-                      {theme === "light" ? <SunIcon /> : theme === "dark" ? <MoonIcon /> : <SunIcon />}
-                    </Button>
-                  </Tooltip>
-
-                  <Tooltip content={isVerticalMode ? "横書きモード" : "縦書きモード"}>
-                    <Button variant="outline" size="small" onClick={toggleVerticalMode}>
-                      <div style={{ transform: isVerticalMode ? "rotate(90deg)" : "none" }}>
-                        <TypeIcon />
-                      </div>
-                    </Button>
-                  </Tooltip>
-
-                  <Tooltip content={showComments ? "コメントを非表示" : "コメントを表示"}>
-                    <Button variant="outline" size="small" onClick={() => setShowComments(!showComments)}>
-                      {showComments ? <EyeOffIcon /> : <EyeIcon />}
-                    </Button>
-                  </Tooltip>
-
-                  <Tooltip content={isFullscreen ? "通常表示" : "全画面表示"}>
-                    <Button variant="outline" size="small" onClick={toggleFullscreen}>
-                      {isFullscreen ? <MinimizeIcon /> : <MaximizeIcon />}
-                    </Button>
-                  </Tooltip>
-                </div>
-              </div>
-
-              <div
-                ref={contentContainerRef}
-                style={{
-                  position: "relative",
-                  overflow: "hidden",
-                  height: isVerticalMode ? (isFullscreen ? "90vh" : "70vh") : "auto",
-                }}
-              >
-                <div
-                  ref={contentRef}
-                  style={{
-                    fontSize: isFullscreen ? "1.125rem" : "1rem",
-                    lineHeight: "1.75",
-                    maxWidth: "none",
-                    writingMode: isVerticalMode ? "vertical-rl" : "horizontal-tb",
-                    textOrientation: isVerticalMode ? "upright" : "mixed",
-                    height: isVerticalMode ? "100%" : "auto",
-                    paddingRight: isVerticalMode ? "1rem" : "0",
-                    paddingLeft: isVerticalMode ? "1rem" : "0",
-                    overflowY: isVerticalMode ? "hidden" : "auto",
-                    overflowX: isVerticalMode ? "auto" : "hidden",
-                    direction: isVerticalMode ? "rtl" : "ltr",
-                    scrollBehavior: "smooth",
-                    msOverflowStyle: "none",
-                    scrollbarWidth: "none",
-                    color: getThemeStyles().color,
-                  }}
-                  onMouseUp={handleTextSelect}
-                >
-                  {sentences.map((sentence, index) => {
-                    const comments = getSentenceComments(index)
-                    const hasComments = comments.length > 0
-
-                    return (
-                      <div
-                        key={index}
-                        style={{
-                          position: "relative",
-                          marginBottom: isVerticalMode ? "0" : "1rem",
-                          marginLeft: isVerticalMode ? "1rem" : "0",
-                        }}
-                      >
-                        <p
-                          style={{
-                            display: "inline",
-                            lineHeight: "1.75",
-                            backgroundColor:
-                              hasComments && showComments
-                                ? theme === "dark"
-                                  ? "rgba(253, 224, 71, 0.2)"
-                                  : "rgba(254, 240, 138, 0.5)"
-                                : selectedSentenceIndex === index
-                                  ? theme === "dark"
-                                    ? "rgba(59, 130, 246, 0.2)"
-                                    : "rgba(219, 234, 254, 0.5)"
-                                  : "transparent",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => handleSentenceClick(index)}
-                        >
-                          {sentence}
-                        </p>
-
-                        {hasComments && showComments && (
-                          <div
-                            style={{
-                              display: "inline-block",
-                              marginLeft: isVerticalMode ? "0" : "0.5rem",
-                              marginTop: isVerticalMode ? "0.5rem" : "0",
-                            }}
-                          >
-                            <Tooltip
-                              content={
-                                <div style={{ padding: "0.5rem" }}>
-                                  {comments.map((comment) => (
-                                    <div key={comment.id} style={{ marginBottom: "0.5rem" }}>
-                                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                        <Avatar
-                                          src={comment.user.avatar}
-                                          alt={comment.user.name}
-                                          fallback={comment.user.name[0]}
-                                          size="small"
-                                        />
-                                        <span style={{ fontWeight: 500 }}>{comment.user.name}</span>
-                                      </div>
-                                      <p style={{ marginTop: "0.25rem", fontSize: "0.875rem" }}>{comment.text}</p>
-                                    </div>
-                                  ))}
-                                </div>
-                              }
-                              side={isVerticalMode ? "bottom" : "right"}
-                            >
-                              <button
-                                style={{
-                                  background: "none",
-                                  border: "none",
-                                  padding: "0",
-                                  width: "1.25rem",
-                                  height: "1.25rem",
-                                  display: "inline-flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  cursor: "pointer",
-                                  color: "#3b82f6",
-                                }}
-                              >
-                                <MessageSquareIcon />
-                                <span
-                                  style={{
-                                    position: "absolute",
-                                    width: "1px",
-                                    height: "1px",
-                                    padding: "0",
-                                    margin: "-1px",
-                                    overflow: "hidden",
-                                    clip: "rect(0, 0, 0, 0)",
-                                    whiteSpace: "nowrap",
-                                    borderWidth: "0",
-                                  }}
-                                >
-                                  コメントを表示
-                                </span>
-                              </button>
-                            </Tooltip>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-
-                {/* 縦書きモードのページナビゲーション */}
-                {isVerticalMode && totalPages > 1 && (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginTop: "1rem",
-                    }}
-                  >
-                    <Button
-                      variant="outline"
-                      size="small"
-                      onClick={nextPage}
-                      disabled={currentPage >= totalPages - 1}
-                      style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-                    >
-                      <ChevronLeftIcon />
-                      前へ
-                    </Button>
-                    <span style={{ fontSize: "0.875rem" }}>
-                      {currentPage + 1} / {totalPages}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="small"
-                      onClick={prevPage}
-                      disabled={currentPage <= 0}
-                      style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-                    >
-                      次へ
-                      <ChevronRightIcon />
-                    </Button>
-                  </div>
-                )}
-              </div>
+            <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>AIに質問する</h2>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>物語の内容について質問できます</p>
             </div>
 
-            {!isFullscreen && (
-              <div
+            <div style={{ padding: "1.5rem" }}>
+              <div style={{ marginBottom: "1rem" }}>
+                <textarea
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  placeholder="例: 「勇者の証」とは何ですか？"
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    borderRadius: "0.375rem",
+                    border: "1px solid var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    minHeight: "100px",
+                    resize: "vertical",
+                  }}
+                />
+              </div>
+
+              <button
+                onClick={handleAskQuestion}
+                disabled={isAsking || !question.trim()}
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
-                  padding: "1rem 1.5rem",
-                  borderTop: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.5rem",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "0.375rem",
+                  backgroundColor: "var(--primary-color)",
+                  color: "var(--primary-foreground)",
+                  border: "none",
+                  cursor: isAsking || !question.trim() ? "not-allowed" : "pointer",
+                  opacity: isAsking || !question.trim() ? 0.5 : 1,
                 }}
               >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                  <path d="M12 17h.01" />
+                </svg>
+                {isAsking ? "処理中..." : "質問する"}
+              </button>
+
+              {answer && (
                 <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    fontSize: "0.875rem",
-                    color: "#6b7280",
+                    marginTop: "1.5rem",
+                    padding: "1rem",
+                    backgroundColor: "var(--bg-muted)",
+                    borderRadius: "0.375rem",
+                    whiteSpace: "pre-wrap",
                   }}
                 >
-                  <BookOpenIcon />
-                  <span style={{ marginLeft: "0.25rem" }}>{novelData.views.toLocaleString()} 閲覧</span>
+                  {answer}
                 </div>
-                <div style={{ display: "flex", gap: "0.5rem" }}>
-                  {selectedSentenceIndex !== null && (
-                    <Button
-                      variant="outline"
-                      size="small"
-                      onClick={() => setIsSentenceCommentDialogOpen(true)}
-                      style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-                    >
-                      <MessageSquareIcon />
-                      選択した文にコメント
-                    </Button>
-                  )}
-
-                  {selectedText && (
-                    <Button
-                      variant="outline"
-                      size="small"
-                      onClick={() => setIsTextCommentDialogOpen(true)}
-                      style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-                    >
-                      <MessageSquareIcon />
-                      選択部分にコメント
-                    </Button>
-                  )}
-
-                  <Button
-                    variant="outline"
-                    size="small"
-                    onClick={() => setIsAiQuestionDialogOpen(true)}
-                    style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-                  >
-                    <HelpCircleIcon />
-                    AIに質問
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {!isFullscreen && (
-            <div style={{ marginTop: "2rem" }}>
-              <Tabs defaultValue="comments">
-                <TabsList>
-                  <TabTrigger value="comments">コメント ({novelData.comments.length})</TabTrigger>
-                  <TabTrigger value="sentenceComments">文コメント ({novelData.sentenceComments.length})</TabTrigger>
-                  <TabTrigger value="chapters">章一覧 ({novelData.chapters.length})</TabTrigger>
-                </TabsList>
-
-                <TabsContent value="comments">
-                  <div
-                    style={{
-                      backgroundColor: getThemeStyles().backgroundColor,
-                      borderRadius: "0.5rem",
-                      border: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: "1.25rem 1.5rem",
-                        borderBottom: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                      }}
-                    >
-                      <h2 style={{ fontSize: "1.125rem", fontWeight: "bold" }}>コメントを投稿</h2>
-                    </div>
-                    <div style={{ padding: "1.5rem" }}>
-                      <div style={{ display: "flex", gap: "1rem" }}>
-                        <Avatar src="/placeholder.svg?height=40&width=40" alt="ユーザー" fallback="ユ" />
-                        <div style={{ flex: 1 }}>
-                          <Textarea
-                            value={commentText}
-                            onChange={(e) => setCommentText(e.target.value)}
-                            placeholder="この作品についてのコメントを書いてください..."
-                            style={{ marginBottom: "0.5rem" }}
-                          />
-                          <Button
-                            onClick={postComment}
-                            style={{
-                              marginLeft: "auto",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "0.5rem",
-                            }}
-                          >
-                            <SendIcon />
-                            投稿
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                    <div style={{ padding: "1.5rem" }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                        {novelData.comments.map((comment) => (
-                          <div
-                            key={comment.id}
-                            style={{
-                              display: "flex",
-                              gap: "1rem",
-                              paddingBottom: "1rem",
-                              borderBottom: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                            }}
-                          >
-                            <Avatar src={comment.user.avatar} alt={comment.user.name} fallback={comment.user.name[0]} />
-                            <div style={{ flex: 1 }}>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "space-between",
-                                  marginBottom: "0.25rem",
-                                }}
-                              >
-                                <span style={{ fontWeight: 500 }}>{comment.user.name}</span>
-                                <span
-                                  style={{
-                                    fontSize: "0.75rem",
-                                    color: "#6b7280",
-                                  }}
-                                >
-                                  {new Date(comment.createdAt).toLocaleDateString()}
-                                </span>
-                              </div>
-                              <p style={{ fontSize: "0.875rem", marginBottom: "0.5rem" }}>{comment.text}</p>
-                              <button
-                                style={{
-                                  background: "none",
-                                  border: "none",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "0.25rem",
-                                  fontSize: "0.75rem",
-                                  color: "#6b7280",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                <ThumbsUpIcon />
-                                <span>{comment.likes}</span>
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="sentenceComments">
-                  <div
-                    style={{
-                      backgroundColor: getThemeStyles().backgroundColor,
-                      borderRadius: "0.5rem",
-                      border: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: "1.25rem 1.5rem",
-                        borderBottom: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                      }}
-                    >
-                      <h2 style={{ fontSize: "1.125rem", fontWeight: "bold" }}>文単位のコメント</h2>
-                      <p style={{ fontSize: "0.875rem", color: "#6b7280" }}>特定の文に対するコメントを表示します</p>
-                    </div>
-                    <div style={{ padding: "1.5rem" }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                        {novelData.sentenceComments.map((comment) => (
-                          <div
-                            key={comment.id}
-                            style={{
-                              display: "flex",
-                              gap: "1rem",
-                              paddingBottom: "1rem",
-                              borderBottom: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                            }}
-                          >
-                            <Avatar src={comment.user.avatar} alt={comment.user.name} fallback={comment.user.name[0]} />
-                            <div style={{ flex: 1 }}>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "space-between",
-                                  marginBottom: "0.25rem",
-                                }}
-                              >
-                                <span style={{ fontWeight: 500 }}>{comment.user.name}</span>
-                                <span
-                                  style={{
-                                    fontSize: "0.75rem",
-                                    color: "#6b7280",
-                                  }}
-                                >
-                                  {new Date(comment.createdAt).toLocaleDateString()}
-                                </span>
-                              </div>
-                              <div
-                                style={{
-                                  backgroundColor:
-                                    theme === "dark" ? "#2d2d2d" : theme === "sepia" ? "#ebe3d5" : "#f3f4f6",
-                                  padding: "0.5rem",
-                                  borderRadius: "0.375rem",
-                                  marginBottom: "0.5rem",
-                                  fontSize: "0.875rem",
-                                }}
-                              >
-                                <q>{sentences[comment.sentenceIndex]}</q>
-                              </div>
-                              <p style={{ fontSize: "0.875rem", marginBottom: "0.5rem" }}>{comment.text}</p>
-                              <button
-                                style={{
-                                  background: "none",
-                                  border: "none",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "0.25rem",
-                                  fontSize: "0.75rem",
-                                  color: "#6b7280",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                <ThumbsUpIcon />
-                                <span>{comment.likes}</span>
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="chapters">
-                  <div
-                    style={{
-                      backgroundColor: getThemeStyles().backgroundColor,
-                      borderRadius: "0.5rem",
-                      border: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: "1.25rem 1.5rem",
-                        borderBottom: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                      }}
-                    >
-                      <h2 style={{ fontSize: "1.125rem", fontWeight: "bold" }}>章一覧</h2>
-                    </div>
-                    <div style={{ padding: "1.5rem" }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                        {novelData.chapters.map((chapter) => (
-                          <div
-                            key={chapter.id}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              padding: "0.75rem",
-                              border: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                              borderRadius: "0.375rem",
-                              transition: "background-color 0.2s",
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.backgroundColor =
-                                theme === "dark" ? "#2d2d2d" : theme === "sepia" ? "#ebe3d5" : "#f3f4f6"
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.backgroundColor = "transparent"
-                            }}
-                          >
-                            <span style={{ fontWeight: 500 }}>{chapter.title}</span>
-                            {chapter.published ? (
-                              <a
-                                href={`/novel/${novelData.id}/chapter/${chapter.id}`}
-                                style={{
-                                  textDecoration: "none",
-                                  color: "#0070f3",
-                                  fontSize: "0.875rem",
-                                  fontWeight: 500,
-                                }}
-                              >
-                                読む
-                              </a>
-                            ) : (
-                              <span style={{ fontSize: "0.875rem", color: "#6b7280" }}>準備中</span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
-        {!isFullscreen && (
-          <div>
-            <div
-              style={{
-                backgroundColor: getThemeStyles().backgroundColor,
-                borderRadius: "0.5rem",
-                border: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                overflow: "hidden",
-                position: "sticky",
-                top: "1.25rem",
-              }}
-            >
-              <div
-                style={{
-                  padding: "1.25rem 1.5rem",
-                  borderBottom: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                }}
-              >
-                <h2 style={{ fontSize: "1.125rem", fontWeight: "bold" }}>作者について</h2>
-              </div>
-              <div style={{ padding: "1.5rem" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    textAlign: "center",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  <Avatar
-                    src="/placeholder.svg?height=64&width=64"
-                    alt={novelData.author}
-                    fallback={novelData.author[0]}
-                    size="large"
-                  />
-                  <h3 style={{ fontWeight: 500, marginTop: "0.5rem" }}>{novelData.author}</h3>
-                  <p style={{ fontSize: "0.875rem", color: "#6b7280" }}>ファンタジー作家</p>
-                </div>
-                <Button style={{ width: "100%", marginBottom: "0.5rem" }}>フォローする</Button>
-                <a
-                  href={`/author/${novelData.authorId}`}
-                  style={{
-                    display: "inline-block",
-                    width: "100%",
-                    textAlign: "center",
-                    padding: "0.5rem 1rem",
-                    borderRadius: "0.375rem",
-                    border: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                    textDecoration: "none",
-                    color: "inherit",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                  }}
-                >
-                  作品一覧を見る
-                </a>
-              </div>
-              <div
-                style={{
-                  padding: "1.25rem 1.5rem",
-                  borderTop: `1px solid ${theme === "dark" ? "#444" : theme === "sepia" ? "#d3c6a6" : "#e2e8f0"}`,
-                }}
-              >
-                <h2 style={{ fontSize: "1.125rem", fontWeight: "bold" }}>おすすめ作品</h2>
-              </div>
-              <div style={{ padding: "1.5rem" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                  {[1, 2, 3].map((id) => (
-                    <a
-                      key={id}
-                      href={`/novel/${id}`}
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        textDecoration: "none",
-                        color: "inherit",
-                      }}
-                    >
-                      <div
+        <div>
+          <div
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+              overflow: "hidden",
+              position: "sticky",
+              top: "1.25rem",
+            }}
+          >
+            <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border-color)" }}>
+              <h2 style={{ fontSize: "1.125rem", fontWeight: "bold" }}>章一覧</h2>
+            </div>
+
+            <div style={{ padding: "1.5rem" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                {novel.chapters.map((chapter) => (
+                  <div
+                    key={chapter.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "0.75rem",
+                      border: "1px solid var(--border-color)",
+                      borderRadius: "0.375rem",
+                      transition: "background-color 0.2s",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--bg-muted)"
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent"
+                    }}
+                  >
+                    <span style={{ fontWeight: 500 }}>{chapter.title}</span>
+                    {chapter.published ? (
+                      <Link
+                        href={`/novel/${novel.id}/chapter/${chapter.id}`}
                         style={{
-                          width: "3rem",
-                          height: "4rem",
-                          backgroundColor: theme === "dark" ? "#2d2d2d" : theme === "sepia" ? "#ebe3d5" : "#f3f4f6",
-                          borderRadius: "0.25rem",
-                          flexShrink: 0,
+                          textDecoration: "none",
+                          color: "var(--primary-color)",
+                          fontSize: "0.875rem",
+                          fontWeight: 500,
                         }}
-                      />
-                      <div>
-                        <h4
-                          style={{
-                            fontWeight: 500,
-                            fontSize: "0.875rem",
-                            marginBottom: "0.25rem",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                            overflow: "hidden",
-                          }}
-                        >
-                          {id === 1 ? "魔法学園の天才少女" : id === 2 ? "剣と魔法の冒険譚" : "未来都市の探偵"}
-                        </h4>
-                        <p style={{ fontSize: "0.75rem", color: "#6b7280" }}>
-                          {id === 1 ? "佐藤花子" : id === 2 ? "山田太郎" : "鈴木一郎"}
-                        </p>
-                      </div>
-                    </a>
-                  ))}
-                </div>
+                      >
+                        読む
+                      </Link>
+                    ) : (
+                      <span style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>準備中</span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
-
-      {/* ダイアログ */}
-      {isSentenceCommentDialogOpen && selectedSentenceIndex !== null && (
-        <Dialog
-          isOpen={isSentenceCommentDialogOpen}
-          onClose={() => setIsSentenceCommentDialogOpen(false)}
-          title="選択した文にコメント"
-          description={`選択した文: ${sentences[selectedSentenceIndex]}`}
-          footer={<Button onClick={postSentenceComment}>投稿する</Button>}
-        >
-          <Textarea
-            value={sentenceCommentText}
-            onChange={(e) => setSentenceCommentText(e.target.value)}
-            placeholder="この部分についてのコメントを書いてください..."
-            style={{ minHeight: "100px" }}
-          />
-        </Dialog>
-      )}
-
-      {isTextCommentDialogOpen && selectedText && (
-        <Dialog
-          isOpen={isTextCommentDialogOpen}
-          onClose={() => setIsTextCommentDialogOpen(false)}
-          title="選択部分にコメント"
-          description={`選択したテキスト: ${selectedText}`}
-          footer={<Button onClick={postComment}>投稿する</Button>}
-        >
-          <Textarea
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            placeholder="この部分についてのコメントを書いてください..."
-            style={{ minHeight: "100px" }}
-          />
-        </Dialog>
-      )}
-
-      {isAiQuestionDialogOpen && (
-        <Dialog
-          isOpen={isAiQuestionDialogOpen}
-          onClose={() => setIsAiQuestionDialogOpen(false)}
-          title="物語についてAIに質問"
-          description="物語の設定や登場人物について質問できます"
-          footer={
-            <Button onClick={askAI} disabled={isAiLoading}>
-              {isAiLoading ? "処理中..." : "質問する"}
-            </Button>
-          }
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            <Textarea
-              value={questionText}
-              onChange={(e) => setQuestionText(e.target.value)}
-              placeholder="例: 「勇者の証」とは何ですか？"
-              style={{ minHeight: "80px" }}
-            />
-            {aiResponse && (
-              <div
-                style={{
-                  backgroundColor: theme === "dark" ? "#2d2d2d" : theme === "sepia" ? "#ebe3d5" : "#f3f4f6",
-                  padding: "1rem",
-                  borderRadius: "0.375rem",
-                  fontSize: "0.875rem",
-                  whiteSpace: "pre-line",
-                }}
-              >
-                {aiResponse}
-              </div>
-            )}
-          </div>
-        </Dialog>
-      )}
     </div>
   )
 }
