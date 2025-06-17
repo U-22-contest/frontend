@@ -458,7 +458,7 @@ export default function Navbar() {const router = useRouter();
                     }}
                   >
                     <Image
-                      src="/placeholder.svg?height=32&width=32"
+                      src="/images/default-avatar.png"
                       alt="ユーザーアイコン"
                       width={32}
                       height={32}
