@@ -11,6 +11,10 @@ export default function WritePage() {
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
   const [genre, setGenre] = useState("fantasy")
   const [isTooltipVisible, setIsTooltipVisible] = useState(false)
+  const [genreInput, setGenreInput] = useState<string>("")
+  const [genreTags, setGenreTags] = useState<string[]>([]) // 追加
+
+
 
   // テキストエリアでのテキスト選択を処理
   const handleTextSelect = () => {
@@ -95,6 +99,25 @@ export default function WritePage() {
     // 実際の実装ではバックエンドにデータを送信
     alert("作品が保存されました: 下書きとして保存しました。")
   }
+const handleGenreBlur = () => {
+  if (!genreInput.trim()) {
+    return;
+  }
+  // 入力欄の内容を分割してタグ化
+  const newTags = genreInput
+    .split(/[\s,]+/)
+    .filter((g) => g.length > 0)
+    .map((g) => g.startsWith("#") ? g : `#${g}`);
+
+  // すでにあるタグと重複しないものだけ追加
+  const mergedTags = [
+    ...genreTags,
+    ...newTags.filter((tag) => !genreTags.includes(tag)),
+  ];
+
+  setGenreTags(mergedTags);
+  setGenreInput(""); // 入力欄を空にする
+};
 
   return (
     <div className={styles.container}>
@@ -228,6 +251,7 @@ export default function WritePage() {
                 )}
               </div>
             </div>
+            
 
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <button
@@ -264,6 +288,7 @@ export default function WritePage() {
                 保存
               </button>
               <button
+              
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -296,6 +321,148 @@ export default function WritePage() {
               </button>
             </div>
           </div>
+
+          <div>
+            <div style={{ display: "flex", paddingBottom: "0.5rem", justifyContent: "flex-start", alignItems: "center" }}>
+              <input
+                type="text"
+                value={genreInput}
+                onChange={(e) => setGenreInput(e.target.value)}
+                placeholder="ジャンル（例: #ファンタジー）"
+                style={{
+                  width: "250px",
+                  minWidth: "120px",
+                  padding: "0.5rem",
+                  fontSize: "0.95rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                  textAlign: "left",
+                  marginRight: "0.5rem",
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (!genreInput.trim()) return;
+                  // 入力値を分割し、#付きに変換
+                  let newTags = genreInput
+                    .split(/[\s,]+/)
+                    .filter((g) => g.length > 0)
+                    .map((g) => g.startsWith("#") ? g : `#${g}`);
+
+                  // 入力内での重複も除外
+                  newTags = Array.from(new Set(newTags));
+
+                  // すでにあるタグも除外
+                  newTags = newTags.filter((tag) => !genreTags.includes(tag));
+
+                  if (newTags.length === 0) {
+                    setGenreInput(""); // 入力欄だけクリア
+                    return;
+                  }
+
+                  setGenreTags([...genreTags, ...newTags]);
+                  setGenreInput("");
+                }}
+                style={{
+                  padding: "0.5rem 1rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                  fontWeight: 400,
+                  fontSize: "0.95rem",
+                  cursor: "pointer",
+                  transition: "background 0.2s",
+                }}
+              >
+                ジャンル追加
+              </button>
+            </div>
+            {/* ジャンルタグのポップアップ表示エリアをなくし、タグ単体で横並び表示 */}
+            {genreTags.length > 0 && (
+              <div
+                style={{
+                  margin: "0.5rem 0 1rem 0",
+                  display: "flex",
+                  gap: "0.5rem",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
+                {genreTags.map((tag, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      background: "#1976d2", // 透過なしの青
+                      borderRadius: "1rem",
+                      padding: "0.25rem 0.75rem",
+                      fontWeight: 600,
+                      letterSpacing: "0.05em",
+                      boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                      display: "inline-block",
+                      cursor: "default",
+                      maxWidth: "150px",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      position: "relative",
+                      color: "#fff",
+                      transition: "all 0.2s",
+                    }}
+                    title={tag}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.overflow = "visible";
+                      e.currentTarget.style.whiteSpace = "normal";
+                      e.currentTarget.style.maxWidth = "none";
+                      e.currentTarget.style.background = "#1565c0"; // 透過なしの濃い青
+                      e.currentTarget.style.zIndex = "10";
+                      // バツボタンを表示
+                      const closeBtn = document.createElement("span");
+                      closeBtn.textContent = "×";
+                      closeBtn.style.position = "absolute";
+                      closeBtn.style.right = "0.4rem";
+                      closeBtn.style.top = "50%";
+                      closeBtn.style.transform = "translateY(-50%)";
+                      closeBtn.style.cursor = "pointer";
+                      closeBtn.style.fontWeight = "bold";
+                      closeBtn.style.fontSize = "1.5rem";
+                      closeBtn.style.color = "#f44336"; 
+                      closeBtn.style.background = "fff"
+                      closeBtn.style.borderRadius = "50%";
+                      closeBtn.style.width = "1.2em";
+                      closeBtn.style.height = "1.2em";
+                      closeBtn.style.display = "flex";
+                      closeBtn.style.alignItems = "center";
+                      closeBtn.style.justifyContent = "center";
+                      closeBtn.className = "genre-close-btn";
+                      closeBtn.onclick = (event) => {
+                        event.stopPropagation();
+                        setGenreTags(genreTags.filter((_, i) => i !== idx));
+                      };
+                      if (!e.currentTarget.querySelector(".genre-close-btn")) {
+                        e.currentTarget.appendChild(closeBtn);
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.overflow = "hidden";
+                      e.currentTarget.style.whiteSpace = "nowrap";
+                      e.currentTarget.style.maxWidth = "150px";
+                      e.currentTarget.style.background = "#1976d2"; // 透過なしの青に戻す
+                      e.currentTarget.style.zIndex = "1";
+                      const closeBtn = e.currentTarget.querySelector(".genre-close-btn");
+                      if (closeBtn) closeBtn.remove();
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+            </div>
 
           <textarea
             placeholder="ここに物語を書き始めましょう..."
