@@ -225,7 +225,7 @@ export default function Navbar() {const router = useRouter();
                         </li>
                         <li>
                           <Link
-                            href="/new-releases"
+                            href="/new" //a
                             style={{
                               display: "flex",
                               height: "100%",
