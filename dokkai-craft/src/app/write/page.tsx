@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import styles from "./page.module.css"
+import { parseContent } from "@/lib/utils"
+
 
 export default function WritePage() {
   const [title, setTitle] = useState("")
@@ -89,12 +91,24 @@ export default function WritePage() {
     setAiSuggestions([])
   }
 
-  // 作品を保存
-  const saveNovel = () => {
-    if (!title) {
-      alert("タイトルが入力されていません: 作品を保存するには、タイトルを入力してください。")
-      return
+    const saveNovel = () => {
+        if (!title) {
+            alert("タイトルが入力されていません: 作品を保存するには、タイトルを入力してください。")
+            return
+        }
+
+        const parsedContent = parseContent(content)
+
+        // 実際の実装ではバックエンドにデータを送信
+        console.log("送信データ", {
+            title,
+            genre,
+            content: parsedContent
+        })
+
+        alert("作品が保存されました: 下書きとして保存しました。")
     }
+
 
     // 実際の実装ではバックエンドにデータを送信
     alert("作品が保存されました: 下書きとして保存しました。")
@@ -118,8 +132,9 @@ const handleGenreBlur = () => {
   setGenreTags(mergedTags);
   setGenreInput(""); // 入力欄を空にする
 };
+=======
 
-  return (
+    return (
     <div className={styles.container}>
       <div className={styles.editorContainer}>
         <div style={{ flex: 1 }}>
