@@ -9,7 +9,8 @@ import { useRouter } from "next/navigation";
 // 仮のユーザー認証状態
 const isAuthenticated = true
 
-export default function Navbar() {const router = useRouter();
+export default function Navbar() {
+  const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isExploreDropdownOpen, setIsExploreDropdownOpen] = useState(false)
@@ -72,6 +73,8 @@ export default function Navbar() {const router = useRouter();
         borderBottom: "1px solid var(--border-color)",
         backgroundColor: "var(--bg-translucent)",
         backdropFilter: "blur(8px)",
+        position: "relative",
+        zIndex: 1000,
       }}
     >
       <div
@@ -152,7 +155,7 @@ export default function Navbar() {const router = useRouter();
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                        color: "var(--icon-color)",
+                      color: "var(--icon-color)",
                     }}
                     onClick={() => setIsExploreDropdownOpen(!isExploreDropdownOpen)}
                   >
@@ -175,15 +178,15 @@ export default function Navbar() {const router = useRouter();
                   {isExploreDropdownOpen && (
                     <div
                       style={{
-                        position: "absolute",
-                        top: "100%",
-                        left: 0,
+                        position: "fixed", // ←ここをabsoluteからfixedに
+                        top: "80px", // headerの高さ分だけ下げる（必要に応じて調整）
+                        left: "calc(50% - 250px)", // 画面中央にしたい場合。必要に応じて調整
                         backgroundColor: "var(--bg-color)",
                         border: "1px solid var(--border-color)",
                         borderRadius: "0.5rem",
                         boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                         width: "500px",
-                        zIndex: 50,
+                        zIndex: 9999,
                         padding: "1rem",
                       }}
                     >
@@ -342,7 +345,7 @@ export default function Navbar() {const router = useRouter();
                   border: "none",
                   backgroundColor: "transparent",
                   cursor: "pointer",
-                    color: "var(--icon-color)",
+                  color: "var(--icon-color)",
                 }}
                 onClick={() => setIsSearchOpen(false)}
               >
@@ -374,7 +377,7 @@ export default function Navbar() {const router = useRouter();
                 border: "none",
                 backgroundColor: "transparent",
                 cursor: "pointer",
-                  color: "var(--icon-color)",
+                color: "var(--icon-color)",
               }}
               onClick={() => setIsSearchOpen(true)}
             >
@@ -410,8 +413,9 @@ export default function Navbar() {const router = useRouter();
                   border: "none",
                   backgroundColor: "transparent",
                   cursor: "pointer",
-                    color: "var(--icon-color)",
+                  color: "var(--icon-color)",
                 }}
+                onClick={() => router.push("/notifications")}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -489,7 +493,7 @@ export default function Navbar() {const router = useRouter();
                       border: "1px solid var(--border-color)",
                       borderRadius: "0.5rem",
                       boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                      zIndex: 50,
+                      zIndex: 9999,
                       marginTop: "0.5rem",
                     }}
                   >
@@ -545,32 +549,46 @@ export default function Navbar() {const router = useRouter();
                       >
                         ブックマーク
                       </Link>
+                      <Link
+                        href="/notifications"
+                        style={{
+                          display: "block",
+                          padding: "0.5rem 0.75rem",
+                          borderRadius: "0.25rem",
+                          fontSize: "0.875rem",
+                          textDecoration: "none",
+                          color: "inherit",
+                        }}
+                        onClick={() => setIsUserDropdownOpen(false)}
+                      >
+                        通知
+                      </Link>
                     </div>
                     <div style={{ height: "1px", backgroundColor: "var(--border-color)" }} />
                     <div style={{ padding: "0.5rem" }}>
-                        <button
-                            style={{
-                                display: "block",
-                                width: "100%",
-                                textAlign: "left",
-                                padding: "0.5rem 0.75rem",
-                                borderRadius: "0.25rem",
-                                fontSize: "0.875rem",
-                                border: "none",
-                                backgroundColor: "transparent",
-                                cursor: "pointer",
-                                color: "inherit",
-                            }}
-                            onClick={() => {
-                                // ログアウト処理（仮）→ 必要に応じて実装
-                                // ここにトークン削除処理などを挿入
+                      <button
+                        style={{
+                          display: "block",
+                          width: "100%",
+                          textAlign: "left",
+                          padding: "0.5rem 0.75rem",
+                          borderRadius: "0.25rem",
+                          fontSize: "0.875rem",
+                          border: "none",
+                          backgroundColor: "transparent",
+                          cursor: "pointer",
+                          color: "inherit",
+                        }}
+                        onClick={() => {
+                          // ログアウト処理（仮）→ 必要に応じて実装
+                          // ここにトークン削除処理などを挿入
 
-                                setIsUserDropdownOpen(false); // メニューを閉じる
-                                router.push("/login"); // ← ログイン画面に遷移
-                            }}
-                        >
-                            ログアウト
-                        </button>
+                          setIsUserDropdownOpen(false); // メニューを閉じる
+                          router.push("/login"); // ← ログイン画面に遷移
+                        }}
+                      >
+                        ログアウト
+                      </button>
                     </div>
                   </div>
                 )}
@@ -633,7 +651,7 @@ export default function Navbar() {const router = useRouter();
               border: "none",
               backgroundColor: "transparent",
               cursor: "pointer",
-                color: "var(--icon-color)",
+              color: "var(--icon-color)",
             }}
             onClick={() => setIsMenuOpen(true)}
             data-menu-trigger="true"
@@ -670,7 +688,7 @@ export default function Navbar() {const router = useRouter();
             maxWidth: "24rem",
             backgroundColor: "var(--bg-color)",
             boxShadow: "-4px 0 6px -1px rgba(0, 0, 0, 0.1)",
-            zIndex: 100,
+            zIndex: 9998,
             padding: "1.5rem",
             overflowY: "auto",
           }}
@@ -723,7 +741,7 @@ export default function Navbar() {const router = useRouter();
                 border: "none",
                 backgroundColor: "transparent",
                 cursor: "pointer",
-                  color: "var(--icon-color)",
+                color: "var(--icon-color)",
               }}
               onClick={() => setIsMenuOpen(false)}
             >
