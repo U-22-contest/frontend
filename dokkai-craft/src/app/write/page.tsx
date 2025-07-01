@@ -121,18 +121,8 @@ const handleGenreBlur = () => {
   setGenreTags(mergedTags);
   setGenreInput(""); // 入力欄を空にする
 };
-        // 実際の実装ではバックエンドにデータを送信
-        console.log("送信データ", {
-            title,
-            genre,
-            content: parsedContent
-        })
 
-        alert("作品が保存されました: 下書きとして保存しました。")
-    }
-
-
-    return (
+  return (
     <div className={styles.container}>
       <div className={styles.editorContainer}>
         <div style={{ flex: 1 }}>
