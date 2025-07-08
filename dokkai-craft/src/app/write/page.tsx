@@ -3,6 +3,7 @@
 import { useState } from "react"
 import styles from "./page.module.css"
 import { parseContent } from "@/lib/utils"
+import { apiService } from "@/lib/api-service"
 
 
 export default function WritePage() {
@@ -27,20 +28,15 @@ export default function WritePage() {
     setIsGenerating(true)
 
     try {
-      // 実際の実装ではFastAPIバックエンドにリクエストを送信
-      // ここではモックデータを使用
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await apiService.completeText({
+        content,
+        genre,
+        ai_provider: "gemini" // Gemini APIを使用
+      })
 
-      const mockSuggestions = [
-        content +
-        "彼は窓の外を見つめ、遠くに広がる山々の稜線を眺めた。雲が低く垂れ込め、雨の匂いが空気中に漂っていた。",
-        content +
-        "彼女は深呼吸をして、目の前の課題に集中した。これまでの努力が実を結ぶ瞬間が近づいていることを感じていた。",
-        content + "街の喧騒が遠のき、静寂が訪れた。時折聞こえる風の音だけが、この場所が現実であることを思い出させた。",
-      ]
-
-      setAiSuggestions(mockSuggestions)
-    } catch {
+      setAiSuggestions(response.suggestions)
+    } catch (error) {
+      console.error("AI補完エラー:", error)
       alert("エラーが発生しました: AIサービスに接続できませんでした。後でもう一度お試しください。")
     } finally {
       setIsGenerating(false)
@@ -57,18 +53,15 @@ export default function WritePage() {
     setIsGenerating(true)
 
     try {
-      // 実際の実装ではFastAPIバックエンドにリクエストを送信
-      // ここではモックデータを使用
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await apiService.suggestDescriptions({
+        text: selectedText,
+        genre,
+        ai_provider: "gemini" // Gemini APIを使用
+      })
 
-      const mockSuggestions = [
-        "陽の光が差し込む窓辺で、埃の粒子が舞い踊っていた。時間が止まったかのような静けさの中で、彼の思考だけが激しく動いていた。",
-        "雨の音が屋根を叩き、部屋の中に心地よいリズムを作り出していた。窓ガラスを伝う雨粒は、外の世界をぼやけた絵画のように変えていた。",
-        "古い木の床は足音に反応して軋み、この家の長い歴史を物語っていた。壁に掛けられた時計の秒針だけが、この静寂を破る唯一の音だった。",
-      ]
-
-      setAiSuggestions(mockSuggestions)
-    } catch {
+      setAiSuggestions(response.suggestions)
+    } catch (error) {
+      console.error("描写提案エラー:", error)
       alert("エラーが発生しました: AIサービスに接続できませんでした。後でもう一度お試しください。")
     } finally {
       setIsGenerating(false)
@@ -82,31 +75,31 @@ export default function WritePage() {
       setContent(content.replace(selectedText, suggestion))
     } else {
       // 文章の続きとして追加
-      setContent(suggestion)
+      setContent(content + suggestion)
     }
     setAiSuggestions([])
   }
 
-    const saveNovel = () => {
-        if (!title) {
-            alert("タイトルが入力されていません: 作品を保存するには、タイトルを入力してください。")
-            return
-        }
-
-        const parsedContent = parseContent(content)
-
-        // 実際の実装ではバックエンドにデータを送信
-        console.log("送信データ", {
-            title,
-            genre,
-            content: parsedContent
-        })
-
-        alert("作品が保存されました: 下書きとして保存しました。")
+  const saveNovel = () => {
+    if (!title) {
+      alert("タイトルが入力されていません: 作品を保存するには、タイトルを入力してください。")
+      return
     }
 
+    const parsedContent = parseContent(content)
 
-    return (
+    // 実際の実装ではバックエンドにデータを送信
+    console.log("送信データ", {
+      title,
+      genre,
+      content: parsedContent
+    })
+
+    alert("作品が保存されました: 下書きとして保存しました。")
+  }
+
+
+  return (
     <div className={styles.container}>
       <div className={styles.editorContainer}>
         <div style={{ flex: 1 }}>
@@ -193,7 +186,7 @@ export default function WritePage() {
                     border: "1px solid var(--border-color)",
                     backgroundColor: "transparent",
                     cursor: "pointer",
-                      color: "var(--icon-color)"
+                    color: "var(--icon-color)"
                   }}
                   onMouseEnter={() => setIsTooltipVisible(true)}
                   onMouseLeave={() => setIsTooltipVisible(false)}
