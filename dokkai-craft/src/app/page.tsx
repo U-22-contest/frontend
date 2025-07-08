@@ -137,7 +137,7 @@ export default function Home() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
+            gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
             gap: "1.5rem",
           }}
         >
@@ -230,7 +230,7 @@ export default function Home() {
       <section
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
+          gridTemplateColumns: "repeat(2, auto-fill, minmax(520px,ifr),minmax(250px, 1fr)1fr)",
           gap: "2rem",
           marginBottom: "3rem",
         }}
