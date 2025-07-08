@@ -50,6 +50,8 @@ export default function RegisterPage() {
                 body: JSON.stringify(payload),
             })
 
+            const data = await res.json()
+
             if (!res.ok) throw new Error(`Failed with status ${res.status}`)
 
             alert("登録が完了しました: ログインしてサービスをご利用ください")

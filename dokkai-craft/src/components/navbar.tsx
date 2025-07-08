@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react"
 import { ThemeSwitcher } from "./theme-switcher"
 import Image from "next/image"
 import { useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 
 // 仮のユーザー認証状態
 const isAuthenticated = true
@@ -20,6 +21,9 @@ export default function Navbar() {
   const exploreDropdownRef = useRef<HTMLDivElement>(null)
   const userDropdownRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === 'authenticated' && session;
 
   // 画面サイズの検出
   useEffect(() => {
@@ -66,6 +70,17 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [])
+
+  const handleLogout = async () => {
+    try {
+      await signOut({
+        redirect: true,
+        callbackUrl: '/login',
+      })
+    } catch (error) {
+        console.error("logout error: ", error);
+    }
+  }
 
   return (
     <header
@@ -499,9 +514,11 @@ export default function Navbar() {
                   >
                     <div style={{ padding: "0.75rem 1rem", fontWeight: "normal" }}>
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                        <p style={{ fontSize: "0.875rem", fontWeight: 500, lineHeight: "1.25" }}>ユーザー名</p>
+                        <p style={{ fontSize: "0.875rem", fontWeight: 500, lineHeight: "1.25" }}>
+                          { session?.user?.name }
+                        </p>
                         <p style={{ fontSize: "0.75rem", lineHeight: "1.25", color: "var(--text-muted)" }}>
-                          user@example.com
+                          { session?.user?.email }
                         </p>
                       </div>
                     </div>
@@ -580,11 +597,11 @@ export default function Navbar() {
                           color: "inherit",
                         }}
                         onClick={() => {
-                          // ログアウト処理（仮）→ 必要に応じて実装
-                          // ここにトークン削除処理などを挿入
-
-                          setIsUserDropdownOpen(false); // メニューを閉じる
-                          router.push("/login"); // ← ログイン画面に遷移
+                            setIsUserDropdownOpen(false); // メニューを閉じる
+                            // ここにトークン削除処理などを挿入
+                            // ログアウト処理
+                            handleLogout();
+                            // router.push("/login"); // ← ログイン画面に遷移
                         }}
                       >
                         ログアウト
