@@ -328,6 +328,7 @@ const handleGenreBlur = () => {
                 type="text"
                 value={genreInput}
                 onChange={(e) => setGenreInput(e.target.value)}
+                onBlur={handleGenreBlur}
                 placeholder="ジャンル（例: #ファンタジー）"
                 style={{
                   width: "250px",
