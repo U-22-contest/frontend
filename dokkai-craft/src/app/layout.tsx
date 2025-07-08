@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 
+import { Providers } from "@/app/providers"
+
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
@@ -20,11 +22,13 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className={inter.className} style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <Navbar />
-          <div style={{ flexGrow: 1 }}>{children}</div>
-          <Footer />
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+            <Navbar />
+            <div style={{ flexGrow: 1 }}>{children}</div>
+            <Footer />
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )

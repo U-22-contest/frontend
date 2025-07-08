@@ -19,16 +19,45 @@ export const authOptions = {
         }
 
         // モックユーザー（実際の実装では削除）
-        if (credentials.email === "user@example.com" && credentials.password === "password") {
-          return {
-            id: "1",
-            name: "テストユーザー",
-            email: "user@example.com",
-            image: "/placeholder.svg?height=32&width=32",
-          }
-        }
+        // if (credentials.email === "user@example.com" && credentials.password === "password") {
+        //   return {
+        //     id: "1",
+        //     name: "テストユーザー",
+        //     email: "user@example.com",
+        //     image: "/placeholder.svg?height=32&width=32",
+        //   }
+        // }
+        //
+        // return null
 
-        return null
+        try {
+          const response = await fetch(`${process.env.NESTJS_API_URL || 'http://localhost:4000'}/auth/signin`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
+          });
+
+          if (!response.ok) return null;
+
+          const data = await response.json();
+
+          const user = {
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.username,
+            accessToken: data.token,
+          };
+          return user
+
+        } catch (error) {
+          console.error('Authorization error:', error);
+          return null;
+        }
       },
     }),
     GoogleProvider({
@@ -38,6 +67,7 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60,
   },
   pages: {
     signIn: "/login",
@@ -45,20 +75,22 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id
+        token.accessToken = user.accessToken;
+        token.userId = user.id;
       }
       return token
     },
     async session({ token, session }) {
-      if (session.user) {
-        session.user.id = token.id
+      if ( token.userId && token.accessToken ) {
+        session.accessToken = token.accessToken as string;
+        session.user.id = token.userId as string;
       }
-      return session
+      return session;
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 }
 
 const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }
-

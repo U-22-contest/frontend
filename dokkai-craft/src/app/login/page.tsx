@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -17,21 +18,24 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      // 実際の実装ではNextAuthを使用して認証
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
 
-      // モックユーザーの検証（実際の実装では削除）
-      if (email === "user@example.com" && password === "password") {
+      if (result?.ok) {
         alert("ログインしました: ようこそ戻ってきました！")
-        router.push("/")
-        router.refresh()
+        router.push('/');
+        router.refresh();
       } else {
-        alert("ログインに失敗しました: メールアドレスまたはパスワードが正しくありません")
+        alert('ログインに失敗しました: メールアドレスまたはパスワードが正しくありません');
       }
-    } catch {
-      alert("エラーが発生しました: 後でもう一度お試しください")
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('エラーが発生しました: 後でもう一度お試しください');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 

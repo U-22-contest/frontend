@@ -14,10 +14,46 @@ export async function POST(request: Request) {
         return NextResponse.json({ message: "missing field" }, { status: 400 })
     }
 
-    // ────────────────────────────────
-    // ここで DB 保存やパスワードハッシュ化を行う想定
-    // ────────────────────────────────
-    console.log("🆕 user registered:", body)
 
-    return NextResponse.json({ message: "ok" }, { status: 200 })
+    try {
+        const response = await fetch(`${process.env.NESTJS_API_URL || 'http://localhost:4000'}/users/signup`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: body.username,
+                email: body.email,
+                password: body.password,
+            }),
+        });
+
+        if (!response.ok) return null;
+
+        const data = await response.json();
+
+        const user = {
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.username,
+            accessToken: data.token,
+        };
+        console.log("data:", user);
+
+        return NextResponse.json(
+            {
+                message: "登録が完了しました",
+                user: {
+                    id: data.user.id,
+                    username: data.user.name,
+                    email: data.user.email,
+                },
+            },
+            { status: 201 }
+        );
+
+    } catch (error) {
+        console.error('signup error:', error);
+        return null;
+    }
 }
