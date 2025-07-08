@@ -7,9 +7,6 @@ import Image from "next/image"
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 
-// 仮のユーザー認証状態
-const isAuthenticated = true
-
 export default function Navbar() {
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false)

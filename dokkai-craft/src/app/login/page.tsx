@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { signIn, getSession } from "next-auth/react"
+import { signIn } from "next-auth/react"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -25,8 +25,6 @@ export default function LoginPage() {
       });
 
       if (result?.ok) {
-        // セッションを確認
-        const session = await getSession();
         alert("ログインしました: ようこそ戻ってきました！")
         router.push('/');
         router.refresh();

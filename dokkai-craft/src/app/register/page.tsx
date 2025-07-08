@@ -50,7 +50,7 @@ export default function RegisterPage() {
                 body: JSON.stringify(payload),
             })
 
-            const data = await res.json()
+            // const data = await res.json()
 
             if (!res.ok) throw new Error(`Failed with status ${res.status}`)
 
